@@ -37,6 +37,12 @@ export async function sendSmtp(args: SendArgs): Promise<void> {
       html: args.html ?? undefined,
     });
   } finally {
-    await client.close().catch(() => {});
+    // denomailer's close() may return void (not a promise) depending on the
+    // connection state — awaiting `.catch` on it threw and masked a successful send.
+    try {
+      await client.close();
+    } catch {
+      /* connection already torn down */
+    }
   }
 }

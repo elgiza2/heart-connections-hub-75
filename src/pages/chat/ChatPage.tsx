@@ -1813,17 +1813,44 @@ const ChatPage = () => {
       return;
     }
 
+    // ── Auto-route plain "اعملي صورة / make me a video" asks typed in normal mode ──
+    let autoMediaMode: "images" | "video" | null = null;
+    let autoMediaModel: typeof mediaModel = null;
+    if (chatMode === "normal" && text.trim()) {
+      try {
+        const { detectMediaIntent, pickDefaultMediaModel } = await import(
+          "@/lib/media/autoMediaIntent"
+        );
+        const intent = detectMediaIntent(text);
+        if (intent) {
+          const picked =
+            mediaModel && mediaModel.type === intent
+              ? mediaModel
+              : await pickDefaultMediaModel(intent);
+          if (picked) {
+            autoMediaMode = intent === "video" ? "video" : "images";
+            autoMediaModel = picked;
+            setMediaModel(picked);
+          }
+        }
+      } catch {
+        /* auto-routing is best-effort — fall back to a normal chat turn */
+      }
+    }
+
     // ── Images / Video mode: plan first, then generation ──
-    if (chatMode === "images" || chatMode === "video") {
-      const expectedMediaType = chatMode === "video" ? "video" : "image";
-      if (!mediaModel || mediaModel.type !== expectedMediaType) {
+    if (chatMode === "images" || chatMode === "video" || autoMediaMode) {
+      const activeMediaMode = autoMediaMode ?? (chatMode as "images" | "video");
+      const activeMediaModel = autoMediaModel ?? mediaModel;
+      const expectedMediaType = activeMediaMode === "video" ? "video" : "image";
+      if (!activeMediaModel || activeMediaModel.type !== expectedMediaType) {
         toast.error(
-          chatMode === "video" ? "Choose a video model first" : "Choose an image model first",
+          activeMediaMode === "video" ? "Choose a video model first" : "Choose an image model first",
         );
         isSubmittingRef.current = false;
         return;
       }
-      const isStartEnd = chatMode === "video" && videoStartEndMode;
+      const isStartEnd = activeMediaMode === "video" && videoStartEndMode;
       if (isStartEnd && (!startFrameUrl || !endFrameUrl)) {
         toast.error("Upload both the first and last frame first");
         isSubmittingRef.current = false;
@@ -1851,8 +1878,8 @@ const ChatPage = () => {
           lastImagePrompt,
           userMsg,
           localTurnId,
-          chatMode,
-          mediaModel,
+          chatMode: activeMediaMode,
+          mediaModel: activeMediaModel,
           videoStartEndMode,
           startFrameUrl,
           endFrameUrl,
