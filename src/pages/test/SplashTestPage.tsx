@@ -114,12 +114,13 @@ export default function SplashTestPage() {
             }}
           >
             <span
-              className="ms-word-text block select-none whitespace-nowrap px-[2.2vmin] pr-[0.6vmin] font-bold"
+              className="ms-word-text block select-none whitespace-nowrap px-[2.2vmin] pr-[0.6vmin]"
               style={{
-                fontFamily: '"Sora", "Manrope", system-ui, sans-serif',
-                fontSize: "10.5vmin",
+                fontFamily: '"Archivo Black", "Sora", system-ui, sans-serif',
+                fontWeight: 400,
+                fontSize: "10vmin",
                 lineHeight: 1.35,
-                letterSpacing: "-0.045em",
+                letterSpacing: "-0.03em",
                 animation: `ms-word-wipe ${DURATION}ms var(--e) forwards, ms-ink ${DURATION}ms linear forwards`,
               }}
             >
