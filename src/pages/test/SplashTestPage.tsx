@@ -57,13 +57,6 @@ export default function SplashTestPage() {
           56%      { clip-path: inset(0 0% 0 0); }
           100%     { clip-path: inset(0 0% 0 0); }
         }
-        /* accent dot pops after the word lands */
-        @keyframes ms-dot {
-          0%, 56%  { opacity: 0; transform: scale(0); }
-          64%      { opacity: 1; transform: scale(1.5); }
-          70%      { opacity: 1; transform: scale(1); }
-          100%     { opacity: 1; transform: scale(1); }
-        }
         /* ink flips to white once the purple has covered the screen */
         @keyframes ms-ink {
           0%, 68%  { color: var(--ms-ink); }
@@ -121,27 +114,17 @@ export default function SplashTestPage() {
             }}
           >
             <span
-              className="ms-word-text block select-none whitespace-nowrap pl-[2.2vmin] font-semibold leading-none"
+              className="ms-word-text block select-none whitespace-nowrap pl-[2.2vmin] font-bold leading-none"
               style={{
-                fontFamily: '"Space Grotesk", "DM Sans", system-ui, sans-serif',
-                fontSize: "11vmin",
-                letterSpacing: "-0.02em",
+                fontFamily: '"Sora", "Manrope", system-ui, sans-serif',
+                fontSize: "10.5vmin",
+                letterSpacing: "-0.045em",
                 animation: `ms-word-wipe ${DURATION}ms var(--e) forwards, ms-ink ${DURATION}ms linear forwards`,
               }}
             >
               megsy
-              <span
-                className="ml-[0.5vmin] inline-block align-baseline"
-                style={{
-                  width: "1.6vmin",
-                  height: "1.6vmin",
-                  borderRadius: "999px",
-                  background: "#C527ED",
-                  opacity: 0,
-                  animation: `ms-dot ${DURATION}ms var(--e) forwards`,
-                }}
-              />
             </span>
+
           </div>
         </div>
       </div>
