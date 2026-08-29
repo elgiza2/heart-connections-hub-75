@@ -813,6 +813,7 @@ const ChatMessage = ({
   toolParts,
   reasoning,
   interrupted,
+  metadata,
   branchInfo,
 
 }: ChatMessageProps) => {
