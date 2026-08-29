@@ -5,40 +5,45 @@
  * switch: it also decides the billing gateway used for every future checkout
  * (Kashier — Vodafone Cash / local wallets / EGP cards — for the Arabic
  * edition, Dodo Payments — international cards & wallets — for the global one).
+ *
+ * Glass segmented switch + a live comparison sheet, so the two editions are
+ * read side by side instead of as two competing blocks.
  */
-import { CreditCard, Globe, Smartphone, Wallet } from "lucide-react";
+import { Check, Coins, CreditCard, Globe, Languages, Smartphone } from "lucide-react";
 import type { PayRegion } from "@/lib/payRegion";
 
-type Option = {
+type Edition = {
   id: PayRegion;
-  title: string;
-  subtitle: string;
+  tab: string;
   dir: "rtl" | "ltr";
-  methods: { icon: typeof Wallet; label: string }[];
+  rows: { icon: typeof Globe; label: string; value: string }[];
+  note: string;
 };
 
-const OPTIONS: Option[] = [
+const EDITIONS: Edition[] = [
   {
     id: "arab",
-    title: "النسخة العربية",
-    subtitle: "واجهة عربية بالكامل وطرق دفع محلية",
+    tab: "العربية",
     dir: "rtl",
-    methods: [
-      { icon: Smartphone, label: "فودافون كاش" },
-      { icon: Wallet, label: "المحافظ الإلكترونية" },
-      { icon: CreditCard, label: "فيزا / ماستركارد بالجنيه" },
+    rows: [
+      { icon: Languages, label: "الواجهة", value: "عربي بالكامل" },
+      { icon: Smartphone, label: "الدفع", value: "فودافون كاش والمحافظ" },
+      { icon: CreditCard, label: "البطاقات", value: "فيزا / ماستركارد محلية" },
+      { icon: Coins, label: "العملة", value: "الجنيه المصري (EGP)" },
     ],
+    note: "يحدد اختيارك لغة الموقع وطرق الدفع المتاحة لك",
   },
   {
     id: "global",
-    title: "Global edition",
-    subtitle: "English interface with worldwide payment methods",
+    tab: "Global",
     dir: "ltr",
-    methods: [
-      { icon: CreditCard, label: "Visa / Mastercard / Amex" },
-      { icon: Wallet, label: "Apple Pay & Google Pay" },
-      { icon: Globe, label: "International currencies" },
+    rows: [
+      { icon: Languages, label: "Interface", value: "English" },
+      { icon: CreditCard, label: "Cards", value: "Visa / Mastercard / Amex" },
+      { icon: Smartphone, label: "Wallets", value: "Apple Pay & Google Pay" },
+      { icon: Globe, label: "Currency", value: "USD & international" },
     ],
+    note: "This sets your language and available payment methods",
   },
 ];
 
@@ -49,85 +54,165 @@ export default function RegionStage({
   value: PayRegion;
   onChange: (region: PayRegion) => void;
 }) {
+  const activeIndex = Math.max(
+    0,
+    EDITIONS.findIndex((e) => e.id === value),
+  );
+  const active = EDITIONS[activeIndex] ?? EDITIONS[0];
+
   return (
-    <div style={{ display: "grid", gap: 14 }}>
-      {OPTIONS.map((opt, i) => {
-        const on = value === opt.id;
-        return (
-          <button
-            key={opt.id}
-            type="button"
-            dir={opt.dir}
-            onClick={() => onChange(opt.id)}
-            className={`fs-up ${on ? "fs-glass fs-glass-selected" : "fs-glass"}`}
-            style={{
-              animationDelay: `${0.18 + i * 0.06}s`,
-              textAlign: opt.dir === "rtl" ? "right" : "left",
-              borderRadius: 22,
-              padding: "18px 18px",
-              color: "#fff",
-              cursor: "pointer",
-              outline: on ? "1.5px solid rgba(255,255,255,0.55)" : "none",
-            }}
-          >
-            <div style={{ fontSize: 19, fontWeight: 600, letterSpacing: "-0.02em" }}>
-              {opt.title}
-            </div>
-            <div
-              style={{
-                fontSize: 13.5,
-                color: "rgba(255,255,255,0.68)",
-                marginTop: 4,
-                lineHeight: 1.45,
-              }}
-            >
-              {opt.subtitle}
-            </div>
-            <div
-              style={{
-                display: "flex",
-                flexWrap: "wrap",
-                gap: 8,
-                marginTop: 14,
-                justifyContent: opt.dir === "rtl" ? "flex-start" : "flex-start",
-              }}
-            >
-              {opt.methods.map((m) => (
-                <span
-                  key={m.label}
-                  style={{
-                    display: "inline-flex",
-                    alignItems: "center",
-                    gap: 6,
-                    borderRadius: 999,
-                    padding: "7px 11px",
-                    fontSize: 12.5,
-                    color: "rgba(255,255,255,0.86)",
-                    background: "rgba(255,255,255,0.10)",
-                  }}
-                >
-                  <m.icon size={14} strokeWidth={1.8} />
-                  {m.label}
-                </span>
-              ))}
-            </div>
-          </button>
-        );
-      })}
-      <p
-        className="fs-up"
+    <div style={{ display: "grid", gap: 16 }}>
+      {/* segmented glass switch */}
+      <div
+        className="fs-up fs-glass"
+        role="group"
+        aria-label="Edition"
         style={{
-          animationDelay: "0.34s",
-          fontSize: 12.5,
-          color: "rgba(255,255,255,0.6)",
-          textAlign: "center",
-          lineHeight: 1.5,
-          marginTop: 2,
+          animationDelay: "0.18s",
+          position: "relative",
+          display: "grid",
+          gridTemplateColumns: "1fr 1fr",
+          borderRadius: 999,
+          padding: 5,
+          overflow: "hidden",
+          background: "rgba(255,255,255,0.06)",
         }}
       >
-        يحدد اختيارك لغة الموقع وطرق الدفع المتاحة لك · This sets your language and
-        available payment methods
-      </p>
+        <span
+          aria-hidden
+          style={{
+            position: "absolute",
+            top: 5,
+            bottom: 5,
+            left: 5,
+            width: "calc(50% - 5px)",
+            borderRadius: 999,
+            background: "rgba(255,255,255,0.92)",
+            boxShadow: "0 8px 22px -12px rgba(0,0,0,0.9)",
+            transform: `translateX(${activeIndex * 100}%)`,
+            transition: "transform .34s cubic-bezier(0.22,1,0.36,1)",
+          }}
+        />
+        {EDITIONS.map((e) => {
+          const on = e.id === active.id;
+          return (
+            <button
+              key={e.id}
+              type="button"
+              aria-pressed={on}
+              onClick={() => onChange(e.id)}
+              style={{
+                position: "relative",
+                zIndex: 1,
+                border: 0,
+                background: "transparent",
+                cursor: "pointer",
+                padding: "11px 8px",
+                borderRadius: 999,
+                fontSize: 14.5,
+                fontWeight: 650,
+                letterSpacing: "-0.01em",
+                color: on ? "#0b0d12" : "rgba(255,255,255,0.78)",
+                transition: "color .28s ease",
+                WebkitTapHighlightColor: "transparent",
+              }}
+            >
+              {e.tab}
+            </button>
+          );
+        })}
+      </div>
+
+      {/* comparison sheet for the active edition */}
+      <div
+        key={active.id}
+        dir={active.dir}
+        className="fs-up fs-glass"
+        style={{
+          animationDelay: "0.06s",
+          borderRadius: 22,
+          padding: "6px 16px 14px",
+          color: "#fff",
+          textAlign: active.dir === "rtl" ? "right" : "left",
+        }}
+      >
+        {active.rows.map((r, i) => (
+          <div
+            key={r.label}
+            style={{
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              padding: "13px 0",
+              borderBottom:
+                i === active.rows.length - 1 ? "none" : "1px solid rgba(255,255,255,0.10)",
+            }}
+          >
+            <span
+              aria-hidden
+              style={{
+                display: "grid",
+                placeItems: "center",
+                width: 30,
+                height: 30,
+                flex: "0 0 auto",
+                borderRadius: 10,
+                background: "rgba(255,255,255,0.10)",
+              }}
+            >
+              <r.icon size={15} strokeWidth={1.8} color="rgba(255,255,255,0.92)" />
+            </span>
+            <span
+              style={{
+                fontSize: 12.5,
+                color: "rgba(255,255,255,0.6)",
+                flex: "0 0 auto",
+                minWidth: 74,
+              }}
+            >
+              {r.label}
+            </span>
+            <span
+              style={{
+                fontSize: 13.5,
+                fontWeight: 600,
+                flex: 1,
+                textAlign: active.dir === "rtl" ? "left" : "right",
+              }}
+            >
+              {r.value}
+            </span>
+          </div>
+        ))}
+
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+            marginTop: 12,
+            padding: "9px 12px",
+            borderRadius: 999,
+            background: "rgba(255,255,255,0.10)",
+          }}
+        >
+          <span
+            aria-hidden
+            style={{
+              display: "grid",
+              placeItems: "center",
+              width: 18,
+              height: 18,
+              borderRadius: 999,
+              background: "#fff",
+              flex: "0 0 auto",
+            }}
+          >
+            <Check size={12} strokeWidth={3} color="#0b0d12" />
+          </span>
+          <span style={{ fontSize: 12.5, color: "rgba(255,255,255,0.88)" }}>{active.note}</span>
+        </div>
+      </div>
     </div>
   );
 }
