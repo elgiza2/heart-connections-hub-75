@@ -237,6 +237,7 @@ const NotificationsPage = () => {
           </div>
         </SubCard>
       </SubSection>
+      )}
     </SubShell>
   );
 };
