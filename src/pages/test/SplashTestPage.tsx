@@ -114,16 +114,18 @@ export default function SplashTestPage() {
             }}
           >
             <span
-              className="ms-word-text block select-none whitespace-nowrap pl-[2.2vmin] font-bold leading-none"
+              className="ms-word-text block select-none whitespace-nowrap px-[2.2vmin] pr-[0.6vmin] font-bold"
               style={{
                 fontFamily: '"Sora", "Manrope", system-ui, sans-serif',
                 fontSize: "10.5vmin",
+                lineHeight: 1.35,
                 letterSpacing: "-0.045em",
                 animation: `ms-word-wipe ${DURATION}ms var(--e) forwards, ms-ink ${DURATION}ms linear forwards`,
               }}
             >
               megsy
             </span>
+
 
           </div>
         </div>
