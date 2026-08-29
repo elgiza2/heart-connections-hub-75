@@ -691,24 +691,6 @@ function MessageView({
   onForward: (m: MailMessage) => void;
   folder: MailFolder;
 }) {
-  const [explaining, setExplaining] = useState(false);
-  const [explanation, setExplanation] = useState<string | null>(null);
-
-  const explain = async () => {
-    setExplaining(true);
-    try {
-      const out = await explainMail({
-        subject: msg.subject,
-        from: msg.from_address,
-        body: msg.body_text || msg.body_html?.replace(/<[^>]+>/g, " ") || "",
-      });
-      setExplanation(out || tx("No explanation available"));
-    } catch (e) {
-      toast.error(e instanceof Error ? e.message : String(e));
-    } finally {
-      setExplaining(false);
-    }
-  };
 
   const who = displayName(msg.from_name, msg.from_address);
 
@@ -774,17 +756,6 @@ function MessageView({
             <p className="whitespace-pre-wrap text-[16px] leading-[1.85] text-foreground/85">{msg.body_text}</p>
           )}
 
-          {explanation && (
-            <div className="mt-7 rounded-3xl bg-primary/[0.07] p-5" style={{ borderRadius: 22 }}>
-              <p className="mb-2 flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.1em] text-primary">
-                <span className="contents">
-                  <Sparkles className="h-3.5 w-3.5" />
-                </span>
-                {tx("Megsy's summary")}
-              </p>
-              <p className="whitespace-pre-wrap text-[14px] leading-[1.75] text-foreground/85">{explanation}</p>
-            </div>
-          )}
         </article>
       </div>
 
@@ -805,9 +776,6 @@ function MessageView({
             </span>
             {tx("Reply")}
           </button>
-          <RoundBtn label={tx("Explain with AI")} disabled={explaining} onClick={() => void explain()}>
-            {explaining ? <Loader2 className="h-[17px] w-[17px] animate-spin" /> : <Sparkles className="h-[17px] w-[17px] text-primary" />}
-          </RoundBtn>
           <RoundBtn label={tx("Forward")} onClick={() => onForward(msg)}>
             <Forward className="h-[17px] w-[17px] rtl:rotate-180" />
           </RoundBtn>
