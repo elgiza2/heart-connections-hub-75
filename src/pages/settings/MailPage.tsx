@@ -485,7 +485,7 @@ export default function MailPage() {
   );
 
   const Body = (
-    <section className="-mx-1 -mt-3 pb-32">
+    <section className="pb-32">
       {Header}
       {Meta}
       {List}
@@ -572,7 +572,7 @@ export default function MailPage() {
       <ProfileGlassShell
         title={tx("Mail")}
         subtitle={tx("Your own Megsy inbox")}
-        onBack={() => (window.history.length > 1 ? window.history.back() : navigate("/settings"))}
+        onBack={() => navigate("/settings")}
       >
         {Body}
       </ProfileGlassShell>
