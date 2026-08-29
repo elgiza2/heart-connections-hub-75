@@ -57,13 +57,6 @@ export default function SplashTestPage() {
           56%      { clip-path: inset(0 0% 0 0); }
           100%     { clip-path: inset(0 0% 0 0); }
         }
-        /* accent dot pops after the word lands */
-        @keyframes ms-dot {
-          0%, 56%  { opacity: 0; transform: scale(0); }
-          64%      { opacity: 1; transform: scale(1.5); }
-          70%      { opacity: 1; transform: scale(1); }
-          100%     { opacity: 1; transform: scale(1); }
-        }
         /* ink flips to white once the purple has covered the screen */
         @keyframes ms-ink {
           0%, 68%  { color: var(--ms-ink); }
