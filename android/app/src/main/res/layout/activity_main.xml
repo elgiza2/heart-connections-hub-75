@@ -61,5 +61,5 @@
             app:backgroundTint="@color/brand_primary" />
     </LinearLayout>
 
-    <include layout="@layout/view_splash" />
+    <include android:id="@+id/splash" layout="@layout/view_splash" />
 </androidx.constraintlayout.widget.ConstraintLayout>

@@ -73,16 +73,16 @@ class MainActivity : AppCompatActivity() {
         binding.webView.loadUrl(target ?: UrlPolicy.START_URL)
 
         SplashAnimation.play(
-            root = binding.splashRoot,
-            flood = binding.splashFlood,
-            lockup = binding.splashLockup,
-            mark = binding.splashMark,
-            word = binding.splashWord,
+            root = binding.splash.splashRoot,
+            flood = binding.splash.splashFlood,
+            lockup = binding.splash.splashLockup,
+            mark = binding.splash.splashMark,
+            word = binding.splash.splashWord,
         ) {
-            binding.splashRoot.animate()
+            binding.splash.splashRoot.animate()
                 .alpha(0f)
                 .setDuration(220)
-                .withEndAction { binding.splashRoot.visibility = View.GONE }
+                .withEndAction { binding.splash.splashRoot.visibility = View.GONE }
                 .start()
         }
 
