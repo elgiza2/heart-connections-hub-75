@@ -78,21 +78,6 @@ export default function RegionStage({
           background: "rgba(255,255,255,0.06)",
         }}
       >
-        <span
-          aria-hidden
-          style={{
-            position: "absolute",
-            top: 5,
-            bottom: 5,
-            left: 5,
-            width: "calc(50% - 5px)",
-            borderRadius: 999,
-            background: "rgba(255,255,255,0.92)",
-            boxShadow: "0 8px 22px -12px rgba(0,0,0,0.9)",
-            transform: `translateX(${activeIndex * 100}%)`,
-            transition: "transform .34s cubic-bezier(0.22,1,0.36,1)",
-          }}
-        />
         {EDITIONS.map((e) => {
           const on = e.id === active.id;
           return (
@@ -105,7 +90,8 @@ export default function RegionStage({
                 position: "relative",
                 zIndex: 1,
                 border: 0,
-                background: "transparent",
+                background: on ? "rgba(255,255,255,0.94)" : "transparent",
+                boxShadow: on ? "0 8px 22px -12px rgba(0,0,0,0.9)" : "none",
                 cursor: "pointer",
                 padding: "11px 8px",
                 borderRadius: 999,
@@ -113,7 +99,8 @@ export default function RegionStage({
                 fontWeight: 650,
                 letterSpacing: "-0.01em",
                 color: on ? "#0b0d12" : "rgba(255,255,255,0.78)",
-                transition: "color .28s ease",
+                transition: "color .28s ease, background .28s ease, box-shadow .28s ease",
+
                 WebkitTapHighlightColor: "transparent",
               }}
             >
