@@ -400,8 +400,8 @@ export function translateAuthError(
 }
 
 export const AVAILABLE_LANGS: { code: AuthLang; label: string; native: string }[] = [
-  { code: "en", label: "English", native: "English" },
-  { code: "ar-eg", label: "Egyptian Arabic", native: "المصري" },
+  { code: "en", label: "English — International zone", native: "English" },
+  { code: "ar-eg", label: "العربية — المنطقة العربية", native: "العربية" },
 ];
 
 /**
