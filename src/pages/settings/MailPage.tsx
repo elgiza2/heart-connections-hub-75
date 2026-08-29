@@ -762,34 +762,33 @@ function MessageView({
       </div>
 
 
-      {/* iOS 26 liquid-glass action bar: Reply pill + circular actions */}
-      <div className="px-3 pb-4 pt-1">
-        <IosActionBar>
-          <button
-            type="button"
-            onClick={() => onReply(msg)}
-            style={{ borderRadius: 9999 }}
-            className="inline-flex h-10 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-primary text-[15px] font-semibold text-primary-foreground shadow-[0_8px_20px_-6px_hsl(var(--primary)/0.6),inset_0_1px_0_hsl(0_0%_100%/0.35)] transition-transform active:scale-[0.97]"
-          >
-            <span className="contents">
-              <CornerUpLeft className="h-[17px] w-[17px] rtl:rotate-180" />
-            </span>
-            {tx("Reply")}
-          </button>
-          <RoundBtn label={tx("Explain with AI")} disabled={explaining} onClick={() => void explain()}>
-            {explaining ? <Loader2 className="h-[17px] w-[17px] animate-spin" /> : <Sparkles className="h-[17px] w-[17px] text-primary" />}
-          </RoundBtn>
-          <RoundBtn label={tx("Forward")} onClick={() => onForward(msg)}>
-            <Forward className="h-[17px] w-[17px] rtl:rotate-180" />
-          </RoundBtn>
-          <RoundBtn
-            label={tx(folder === "spam" ? "Not spam" : "Mark as spam")}
-            onClick={() => onAct(msg, folder === "spam" ? "inbox" : "spam")}
-          >
-            <Inbox className="h-[17px] w-[17px]" />
-          </RoundBtn>
-        </IosActionBar>
+      {/* Action bar — flat, attached to the reading surface */}
+      <div className="flex items-center gap-2 border-t border-foreground/[0.07] bg-card px-3 py-3">
+        <button
+          type="button"
+          onClick={() => onReply(msg)}
+          style={{ borderRadius: 9999 }}
+          className="inline-flex h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-primary text-[15px] font-semibold text-primary-foreground transition-transform active:scale-[0.97]"
+        >
+          <span className="contents">
+            <CornerUpLeft className="h-[17px] w-[17px] rtl:rotate-180" />
+          </span>
+          {tx("Reply")}
+        </button>
+        <RoundBtn label={tx("Explain with AI")} disabled={explaining} onClick={() => void explain()}>
+          {explaining ? <Loader2 className="h-[17px] w-[17px] animate-spin" /> : <Sparkles className="h-[17px] w-[17px] text-primary" />}
+        </RoundBtn>
+        <RoundBtn label={tx("Forward")} onClick={() => onForward(msg)}>
+          <Forward className="h-[17px] w-[17px] rtl:rotate-180" />
+        </RoundBtn>
+        <RoundBtn
+          label={tx(folder === "spam" ? "Not spam" : "Mark as spam")}
+          onClick={() => onAct(msg, folder === "spam" ? "inbox" : "spam")}
+        >
+          <Inbox className="h-[17px] w-[17px]" />
+        </RoundBtn>
       </div>
+
 
     </Sheet>
   );
