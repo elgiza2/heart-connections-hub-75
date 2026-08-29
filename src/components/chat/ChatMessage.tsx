@@ -85,7 +85,6 @@ import {
 import { Message, MessageContent } from "@/components/prompt-kit/message";
 import { ToolCard } from "@/pages/chat/components/aui/ToolCard";
 import ThinkingTrace from "./ThinkingTrace";
-import { MessageInsights } from "@/components/chat/MessageInsights";
 import { estimateTokens, formatTokens } from "@/pages/chat/utils/estimateTokens";
 
 
@@ -1392,6 +1391,7 @@ const ChatMessage = ({
   const showSlidesInfoBox =
     role === "assistant" &&
     (looksLikeSlidesInfo(displayContent) || (!!isSlidesMode && displayContent.trim().length > 0));
+  const hasRunningTool = !!toolParts?.some((part) => part.state === "running");
 
   return (
     <Message
@@ -1439,9 +1439,6 @@ const ChatMessage = ({
 
         {role === "assistant" && !isStreaming && !showNarration && !!thoughtsText && (
           <ThinkingTrace text={thoughtsText} />
-        )}
-        {role === "assistant" && !isStreaming && metadata && (
-          <MessageInsights metadata={metadata} />
         )}
         {role === "assistant" && interrupted && !isStreaming && (
           <div className="mb-2 flex items-center gap-2 rounded-lg border border-amber-400/30 bg-amber-400/10 px-3 py-2 text-xs text-amber-200">
@@ -1885,7 +1882,7 @@ const ChatMessage = ({
             {bottomSlot && !isStreaming && <div className="mt-3">{bottomSlot}</div>}
 
             {/* Action buttons: like + copy + dislike only */}
-            {!isStreaming && content && !showSlidesInfoBox && !hideActions && (
+            {!isStreaming && !hasRunningTool && content && !showSlidesInfoBox && !hideActions && (
               <div className="flex items-center gap-1 mt-2">
                 <motion.button
                   onClick={() => handleLikeAction(liked === true ? null : true)}
@@ -1948,7 +1945,7 @@ const ChatMessage = ({
                 </motion.button>
               </div>
             )}
-            {!isStreaming && content && (
+            {!isStreaming && !hasRunningTool && content && (
               <ReactionsRow
                 reactions={reactions || []}
                 currentUserId={currentUserId}

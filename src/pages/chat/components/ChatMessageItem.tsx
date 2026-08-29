@@ -135,7 +135,8 @@ const ChatMessageItemImpl = ({
     msg.role === "user" && !!msg.user_id && !!chatUserId && msg.user_id !== chatUserId;
   const isLast = i === lastMessageIdx;
   const isLastAssistant = isLast && msg.role === "assistant";
-  const isStreamingThis = isLoading && isLastAssistant;
+  const hasRunningTool = !!msg.toolParts?.some((part) => part.state === "running");
+  const isStreamingThis = (isLoading && isLastAssistant) || hasRunningTool;
   // While media is generating we show a single skeleton tile — the thinking
   // bubble is suppressed so the user never sees two stacked loading boxes.
   const showMediaSkeleton =
@@ -304,7 +305,7 @@ const ChatMessageItemImpl = ({
               </Suspense>
             ) : undefined
           }
-          hideActions={msg.role === "assistant" && !!msg.docsClarify}
+          hideActions={msg.role === "assistant" && (!!msg.docsClarify || hasRunningTool)}
         />
       )}
       {msg.role === "assistant" && msg.docsPlan && (

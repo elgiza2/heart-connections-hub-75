@@ -2,7 +2,7 @@
 import { handleLongRun, type LongRunPayload } from "../src/lib/longrun/core";
 import { apiHeaders, authenticateRequest } from "../src/lib/api/authenticateRequest";
 
-export const config = { runtime: "nodejs" };
+export const config = { runtime: "nodejs", maxDuration: 300 };
 
 export default async function handler(req: Request): Promise<Response> {
   const headers = apiHeaders(req);

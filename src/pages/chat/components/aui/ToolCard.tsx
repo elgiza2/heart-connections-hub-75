@@ -35,7 +35,7 @@ export function ToolCard({ part, userId }: { part: ToolPart; userId?: string | n
   const needsApproval = sensitive && decision === null && part.result !== undefined;
   const denied = decision === "denied";
 
-  const meta = getToolMeta(part.name);
+  const meta = getToolMeta(part.name, part.appSlug);
   const Icon = meta.icon;
   const running = part.state === "running";
   const failed = part.state === "error";
