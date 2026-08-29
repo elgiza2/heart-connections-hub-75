@@ -70,7 +70,7 @@ const NotificationsPage = () => {
       setUserId(user.id);
       const { data } = await supabase
         .from("notification_preferences")
-        .select("app_generation,app_credits,app_referral,app_system,email_transactions,email_low_balance,email_welcome,email_newsletter")
+        .select("app_generation,app_credits,app_referral,app_system,email_enabled,email_transactions,email_low_balance,email_welcome,email_newsletter")
         .eq("user_id", user.id)
         .maybeSingle();
       if (cancelled) return;
@@ -154,17 +154,28 @@ const NotificationsPage = () => {
 
           <div className="npg-section-title">Email</div>
           <div className="npg-card">
-            {EMAIL_TOGGLES.map((t, i) => (
-              <ToggleRow
-                key={t.key}
-                title={t.title}
-                desc={t.desc}
-                checked={prefs[t.key]}
-                onChange={(v) => setKey(t.key, v)}
-                divider={i < EMAIL_TOGGLES.length - 1}
-              />
-            ))}
+            <ToggleRow
+              title="Email notifications"
+              desc="Turn off to stop all emails from Megsy, including product news"
+              checked={prefs.email_enabled}
+              onChange={(v) => setKey("email_enabled", v)}
+              divider={false}
+            />
           </div>
+          {prefs.email_enabled && (
+            <div className="npg-card" style={{ marginTop: 12 }}>
+              {EMAIL_TOGGLES.map((t, i) => (
+                <ToggleRow
+                  key={t.key}
+                  title={t.title}
+                  desc={t.desc}
+                  checked={prefs[t.key]}
+                  onChange={(v) => setKey(t.key, v)}
+                  divider={i < EMAIL_TOGGLES.length - 1}
+                />
+              ))}
+            </div>
+          )}
 
           <div className="npg-spacer" />
         </main>
