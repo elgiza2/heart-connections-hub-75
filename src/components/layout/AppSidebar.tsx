@@ -135,7 +135,8 @@ const AppSidebar = ({
   const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
   const [credits, setCredits] = useState(0);
   const [currentUserId, setCurrentUserId] = useState<string | null>(null);
-  const [moreOpen, setMoreOpen] = useState(false);
+  // The nav list is always fully expanded — the old "More" toggle is gone.
+  const [moreOpen, setMoreOpen] = useState(true);
   const [mobileScrolled, setMobileScrolled] = useState(false);
 
   // When the sidebar closes (mobile overlay OR underlay), collapse the
@@ -143,7 +144,7 @@ const AppSidebar = ({
   // Without this, the underlay panel (always-mounted) keeps `moreOpen=true`
   // forever because its mobile UI hides the toggle once expanded.
   useEffect(() => {
-    if (!open) setMoreOpen(false);
+    if (!open) setMoreOpen(true);
   }, [open]);
 
   const isBuildMode = currentMode === "build";
@@ -618,7 +619,7 @@ const AppSidebar = ({
           <>
             <motion.button
               layout
-              onClick={() => setMoreOpen((v) => !v)}
+              onClick={() => setMoreOpen(true)}
               initial={false}
               animate={{
                 color: moreOpen ? "var(--overlay-white-100)" : "var(--overlay-white-60)",
@@ -626,7 +627,7 @@ const AppSidebar = ({
               }}
               whileHover={{ backgroundColor: "var(--overlay-white-04)" }}
               whileTap={{ scale: 0.985 }}
-              className="group relative w-full h-10 pl-3 pr-3 flex items-center gap-3 rounded-xl transition-shadow"
+              className="hidden"
               aria-expanded={moreOpen}
             >
               <span
