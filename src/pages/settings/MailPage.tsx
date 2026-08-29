@@ -373,7 +373,7 @@ export default function MailPage() {
 
 
       {searching && (
-        <div className={`${glassCardCls} flex h-12 items-center gap-2.5 px-4`} style={{ borderRadius: 9999 }}>
+        <div className="flex h-11 items-center gap-2.5 rounded-2xl border border-foreground/[0.07] bg-foreground/[0.03] px-3.5" style={{ borderRadius: 16 }}>
           <SearchIcon className="h-4 w-4 shrink-0 text-foreground/35" />
           <input
             autoFocus
