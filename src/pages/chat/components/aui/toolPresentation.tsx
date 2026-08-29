@@ -124,7 +124,10 @@ const IMAGE_RE = /https?:\/\/[^\s"')]+\.(png|jpe?g|webp|gif|avif)(\?[^\s"')]*)?/
 const FILE_RE = /https?:\/\/[^\s"')]+\.(pdf|docx?|xlsx?|pptx?|csv|zip|txt|md|mp4|mp3|wav)(\?[^\s"')]*)?/gi;
 
 function collect(value: unknown, re: RegExp): string[] {
+  // safeStringifyTool returns undefined for empty/unserialisable results — a
+  // running tool has no result yet, so guard before scanning.
   const text = typeof value === "string" ? value : safeStringifyTool(value);
+  if (typeof text !== "string" || !text) return [];
   const out = new Set<string>();
   for (const m of text.matchAll(re)) out.add(m[0]);
   return [...out].slice(0, 8);
