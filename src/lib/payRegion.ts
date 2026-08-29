@@ -38,13 +38,24 @@ export function isArabBilling(): boolean {
  */
 export function guessPayRegion(): PayRegion {
   if (typeof window === "undefined") return "global";
+  const ARAB_COUNTRIES = new Set([
+    "EG","SA","AE","KW","QA","BH","OM","JO","LB","SY","IQ","YE","PS","SD","LY","TN","DZ","MA","MR","SO","DJ","KM",
+  ]);
   try {
-    const lang = (navigator.language || "").toLowerCase();
-    if (lang.startsWith("ar")) return "arab";
-    const langs = (navigator.languages || []).map((l) => l.toLowerCase());
-    if (langs.some((l) => l.startsWith("ar"))) return "arab";
+    const locales = [navigator.language, ...(navigator.languages || [])].filter(Boolean) as string[];
+    for (const raw of locales) {
+      const l = raw.toLowerCase();
+      if (l.startsWith("ar")) return "arab";
+      // country subtag, e.g. "en-EG"
+      const country = raw.split(/[-_]/)[1]?.toUpperCase();
+      if (country && ARAB_COUNTRIES.has(country)) return "arab";
+    }
     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone || "";
-    if (/^(Africa\/(Cairo|Algiers|Tunis|Tripoli|Khartoum|Casablanca)|Asia\/(Riyadh|Dubai|Kuwait|Qatar|Bahrain|Muscat|Baghdad|Amman|Beirut|Damascus|Aden|Gaza|Hebron))$/.test(tz))
+    if (
+      /^(Africa\/(Cairo|Algiers|Tunis|Tripoli|Khartoum|Casablanca|El_Aaiun|Nouakchott|Mogadishu|Djibouti|Juba)|Asia\/(Riyadh|Dubai|Kuwait|Qatar|Bahrain|Muscat|Baghdad|Amman|Beirut|Damascus|Aden|Gaza|Hebron)|Indian\/Comoro)$/.test(
+        tz,
+      )
+    )
       return "arab";
   } catch {
     // ignore
