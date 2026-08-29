@@ -11,6 +11,7 @@
  */
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2.45.0";
 import { sendSmtp, smtpConfigured } from "../_shared/smtp.ts";
+import { renderBrandEmail } from "../_shared/email-templates/brand.ts";
 
 
 const corsHeaders = {
