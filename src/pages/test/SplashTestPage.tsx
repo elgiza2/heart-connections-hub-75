@@ -1,11 +1,18 @@
 /**
- * SplashTestPage — prototype of the native Android splash (2s).
- * Sequence: logo → silver light sweep → morph into the "megsy" wordmark → app.
- * Route: /test (design preview only, not part of the product flow).
+ * SplashTestPage — prototype of the native Android splash (~2s).
+ *
+ * Technique (borrowed from the SVG "wordmark reveal + specular sweep" pattern):
+ * the silver light is a gradient band masked to the logo geometry itself, so it
+ * travels *through* the mark instead of sitting on a rectangle above it.
+ *
+ * Sequence: logo settles -> silver specular sweep -> slabs collapse into the
+ * "megsy" wordmark (staggered letters + gloss pass) -> app.
+ * Route: /test (design preview only).
  */
 import { useCallback, useEffect, useState } from "react";
 
 const DURATION = 2000;
+const LETTERS = ["m", "e", "g", "s", "y"];
 
 export default function SplashTestPage() {
   const [runId, setRunId] = useState(0);
@@ -13,7 +20,7 @@ export default function SplashTestPage() {
 
   useEffect(() => {
     setDone(false);
-    const t = setTimeout(() => setDone(true), DURATION + 250);
+    const t = setTimeout(() => setDone(true), DURATION + 200);
     return () => clearTimeout(t);
   }, [runId]);
 
@@ -22,103 +29,155 @@ export default function SplashTestPage() {
   return (
     <div className="relative min-h-[100dvh] w-full overflow-hidden">
       <style>{`
-        @keyframes megsy-logo-in {
-          0%   { opacity: 0; transform: scale(.86); }
-          18%  { opacity: 1; transform: scale(1); }
-          52%  { opacity: 1; transform: scale(1); }
-          66%  { opacity: 0; transform: scale(.92); }
-          100% { opacity: 0; transform: scale(.92); }
+        @keyframes ms-mark {
+          0%   { opacity: 0; transform: scale(.9) translateY(6px); }
+          14%  { opacity: 1; transform: scale(1) translateY(0); }
+          54%  { opacity: 1; transform: scale(1) translateY(0); }
+          64%  { opacity: 0; transform: scale(1.06) translateY(-6px); }
+          100% { opacity: 0; transform: scale(1.06) translateY(-6px); }
         }
-        @keyframes megsy-sweep {
-          0%, 18%  { transform: translateX(-160%) skewX(-18deg); opacity: 0; }
-          26%      { opacity: 1; }
-          52%      { transform: translateX(160%) skewX(-18deg); opacity: 0; }
-          100%     { transform: translateX(160%) skewX(-18deg); opacity: 0; }
+        @keyframes ms-slab-l {
+          0%, 54% { transform: translateX(0) rotate(4deg); }
+          64%     { transform: translateX(6%) rotate(0deg); }
+          100%    { transform: translateX(6%) rotate(0deg); }
         }
-        @keyframes megsy-word-in {
-          0%, 58%  { opacity: 0; transform: translateY(10px) scale(.96); letter-spacing: .34em; }
-          78%      { opacity: 1; transform: translateY(0) scale(1); letter-spacing: .16em; }
-          100%     { opacity: 1; transform: translateY(0) scale(1); letter-spacing: .16em; }
+        @keyframes ms-slab-r {
+          0%, 54% { transform: translateX(0) rotate(4deg); }
+          64%     { transform: translateX(-6%) rotate(0deg); }
+          100%    { transform: translateX(-6%) rotate(0deg); }
         }
-        @keyframes megsy-shine {
-          0%, 60% { background-position: -220% 0; }
-          100%    { background-position: 220% 0; }
+        @keyframes ms-letter {
+          0%   { opacity: 0; transform: translateY(14px); filter: blur(6px); }
+          100% { opacity: 1; transform: translateY(0); filter: blur(0); }
         }
-        @keyframes megsy-halo {
-          0%   { opacity: 0; transform: scale(.7); }
-          40%  { opacity: .5; transform: scale(1); }
-          100% { opacity: .18; transform: scale(1.25); }
+        @keyframes ms-gloss {
+          0%   { transform: translateX(-130%) skewX(-16deg); }
+          100% { transform: translateX(130%) skewX(-16deg); }
+        }
+        @keyframes ms-halo {
+          0%   { opacity: 0; transform: scale(.75); }
+          35%  { opacity: .55; transform: scale(1); }
+          100% { opacity: .22; transform: scale(1.3); }
         }
         @media (prefers-reduced-motion: reduce) {
-          .megsy-splash * { animation-duration: .01ms !important; animation-iteration-count: 1 !important; }
+          .ms-splash * { animation-duration: .01ms !important; }
         }
       `}</style>
 
       <div
         key={runId}
-        className="megsy-splash absolute inset-0 grid place-items-center"
+        className="ms-splash absolute inset-0 grid place-items-center"
         style={{
           background:
-            "radial-gradient(120% 90% at 50% 20%, #D449F5 0%, #C527ED 42%, #8E11B0 100%)",
+            "radial-gradient(120% 95% at 50% 18%, #DA57F8 0%, #C527ED 45%, #7C0D9C 100%)",
         }}
       >
-        {/* soft halo behind the mark */}
         <div
-          className="pointer-events-none absolute h-[46vmin] w-[46vmin] rounded-full"
+          className="pointer-events-none absolute h-[52vmin] w-[52vmin] rounded-full"
           style={{
-            background: "radial-gradient(circle, rgba(255,255,255,.35), transparent 65%)",
-            filter: "blur(28px)",
-            animation: `megsy-halo ${DURATION}ms ease-out forwards`,
+            background: "radial-gradient(circle, rgba(255,255,255,.4), transparent 66%)",
+            filter: "blur(34px)",
+            animation: `ms-halo ${DURATION}ms ease-out forwards`,
           }}
         />
 
-        {/* logo + silver sweep */}
-        <div
-          className="absolute"
-          style={{ animation: `megsy-logo-in ${DURATION}ms cubic-bezier(.22,1,.36,1) forwards` }}
+        {/* ── Logo mark with masked specular sweep ─────────────── */}
+        <svg
+          viewBox="0 0 512 512"
+          className="absolute h-[32vmin] w-[32vmin]"
+          aria-hidden="true"
+          style={{ animation: `ms-mark ${DURATION}ms cubic-bezier(.22,1,.36,1) forwards` }}
         >
-          <div className="relative h-[30vmin] w-[30vmin] overflow-hidden">
-            <svg viewBox="0 0 512 512" className="h-full w-full" aria-hidden="true">
-              <g fill="#ffffff">
-                <rect x="110" y="86" width="140" height="272" rx="34" transform="rotate(4 180 222)" />
-                <rect x="266" y="146" width="140" height="288" rx="34" transform="rotate(4 336 290)" />
+          <defs>
+            <linearGradient id="ms-silver" x1="0" y1="0" x2="1" y2="0">
+              <stop offset="0%" stopColor="#ffffff" stopOpacity="0" />
+              <stop offset="38%" stopColor="#ffffff" stopOpacity="0" />
+              <stop offset="47%" stopColor="#f2f5fb" stopOpacity=".55" />
+              <stop offset="50%" stopColor="#ffffff" stopOpacity="1" />
+              <stop offset="53%" stopColor="#cdd6e6" stopOpacity=".85" />
+              <stop offset="62%" stopColor="#ffffff" stopOpacity="0" />
+              <stop offset="100%" stopColor="#ffffff" stopOpacity="0" />
+              <animateTransform
+                attributeName="gradientTransform"
+                type="translate"
+                values="-1.2 0; 1.2 0"
+                keyTimes="0; 1"
+                begin="0.3s"
+                dur="0.85s"
+                fill="freeze"
+                calcMode="spline"
+                keySplines="0.4 0 0.2 1"
+              />
+            </linearGradient>
+            <mask id="ms-mask">
+              <g fill="#fff">
+                <rect x="110" y="86" width="140" height="272" rx="34" />
+                <rect x="266" y="146" width="140" height="288" rx="34" />
               </g>
-            </svg>
-            {/* clean silver light passing through the mark */}
-            <div
-              className="pointer-events-none absolute inset-0"
+            </mask>
+          </defs>
+
+          <g
+            style={{
+              transformOrigin: "180px 222px",
+              animation: `ms-slab-l ${DURATION}ms cubic-bezier(.65,0,.35,1) forwards`,
+            }}
+          >
+            <rect x="110" y="86" width="140" height="272" rx="34" fill="#fff" />
+          </g>
+          <g
+            style={{
+              transformOrigin: "336px 290px",
+              animation: `ms-slab-r ${DURATION}ms cubic-bezier(.65,0,.35,1) forwards`,
+            }}
+          >
+            <rect x="266" y="146" width="140" height="288" rx="34" fill="#fff" />
+          </g>
+
+          {/* silver band, clipped to the mark */}
+          <rect
+            x="-256"
+            y="-256"
+            width="1024"
+            height="1024"
+            fill="url(#ms-silver)"
+            mask="url(#ms-mask)"
+            style={{ mixBlendMode: "screen" }}
+          />
+        </svg>
+
+        {/* ── Wordmark ─────────────────────────────────────────── */}
+        <div
+          className="absolute flex select-none items-baseline overflow-hidden"
+          style={{ height: "1.2em", fontSize: "12vmin" }}
+        >
+          <div className="relative flex">
+            {LETTERS.map((ch, i) => (
+              <span
+                key={ch + i}
+                className="block font-semibold leading-none text-white"
+                style={{
+                  fontFamily: '"Space Grotesk", "DM Sans", system-ui, sans-serif',
+                  letterSpacing: "0.02em",
+                  opacity: 0,
+                  animation: `ms-letter 420ms cubic-bezier(.22,1,.36,1) forwards`,
+                  animationDelay: `${1180 + i * 60}ms`,
+                }}
+              >
+                {ch}
+              </span>
+            ))}
+            {/* gloss pass over the finished wordmark */}
+            <span
+              className="pointer-events-none absolute inset-y-0 -left-1/3 w-1/3"
               style={{
                 background:
-                  "linear-gradient(100deg, transparent 38%, rgba(255,255,255,.15) 46%, rgba(226,232,240,.95) 50%, rgba(255,255,255,.15) 54%, transparent 62%)",
-                mixBlendMode: "screen",
-                filter: "blur(1px)",
-                animation: `megsy-sweep ${DURATION}ms cubic-bezier(.4,0,.2,1) forwards`,
+                  "linear-gradient(90deg, transparent, rgba(255,255,255,.85), transparent)",
+                mixBlendMode: "overlay",
+                animation: `ms-gloss 620ms cubic-bezier(.4,0,.2,1) 1500ms both`,
               }}
             />
           </div>
-        </div>
-
-        {/* wordmark */}
-        <div
-          className="absolute select-none text-[11vmin] font-semibold lowercase leading-none"
-          style={{
-            fontFamily: '"Space Grotesk", "DM Sans", system-ui, sans-serif',
-            animation: `megsy-word-in ${DURATION}ms cubic-bezier(.22,1,.36,1) forwards`,
-          }}
-        >
-          <span
-            style={{
-              background:
-                "linear-gradient(100deg, #ffffff 40%, #e8ecf4 47%, #ffffff 54%, #ffffff 100%)",
-              backgroundSize: "220% 100%",
-              WebkitBackgroundClip: "text",
-              backgroundClip: "text",
-              color: "transparent",
-              animation: `megsy-shine ${DURATION}ms ease-out forwards`,
-            }}
-          >
-            megsy
-          </span>
         </div>
       </div>
 
@@ -131,7 +190,7 @@ export default function SplashTestPage() {
           إعادة التشغيل
         </button>
         <span className="text-xs text-white/70">
-          {done ? "انتهى — التطبيق يفتح هنا" : "جارٍ التشغيل…"} · 2s
+          {done ? "انتهى — التطبيق يفتح فورًا" : "جارٍ التشغيل…"} · 2s
         </span>
       </div>
     </div>
