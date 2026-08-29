@@ -14,6 +14,7 @@ type Prefs = {
   app_credits: boolean;
   app_referral: boolean;
   app_system: boolean;
+  email_enabled: boolean;
   email_transactions: boolean;
   email_low_balance: boolean;
   email_welcome: boolean;
@@ -25,6 +26,7 @@ const DEFAULTS: Prefs = {
   app_credits: true,
   app_referral: true,
   app_system: true,
+  email_enabled: true,
   email_transactions: true,
   email_low_balance: true,
   email_welcome: true,
@@ -68,7 +70,7 @@ const NotificationsPage = () => {
       setUserId(user.id);
       const { data } = await supabase
         .from("notification_preferences")
-        .select("app_generation,app_credits,app_referral,app_system,email_transactions,email_low_balance,email_welcome,email_newsletter")
+        .select("app_generation,app_credits,app_referral,app_system,email_enabled,email_transactions,email_low_balance,email_welcome,email_newsletter")
         .eq("user_id", user.id)
         .maybeSingle();
       if (cancelled) return;
@@ -152,17 +154,28 @@ const NotificationsPage = () => {
 
           <div className="npg-section-title">Email</div>
           <div className="npg-card">
-            {EMAIL_TOGGLES.map((t, i) => (
-              <ToggleRow
-                key={t.key}
-                title={t.title}
-                desc={t.desc}
-                checked={prefs[t.key]}
-                onChange={(v) => setKey(t.key, v)}
-                divider={i < EMAIL_TOGGLES.length - 1}
-              />
-            ))}
+            <ToggleRow
+              title="Email notifications"
+              desc="Turn off to stop all emails from Megsy, including product news"
+              checked={prefs.email_enabled}
+              onChange={(v) => setKey("email_enabled", v)}
+              divider={false}
+            />
           </div>
+          {prefs.email_enabled && (
+            <div className="npg-card" style={{ marginTop: 12 }}>
+              {EMAIL_TOGGLES.map((t, i) => (
+                <ToggleRow
+                  key={t.key}
+                  title={t.title}
+                  desc={t.desc}
+                  checked={prefs[t.key]}
+                  onChange={(v) => setKey(t.key, v)}
+                  divider={i < EMAIL_TOGGLES.length - 1}
+                />
+              ))}
+            </div>
+          )}
 
           <div className="npg-spacer" />
         </main>
@@ -196,6 +209,21 @@ const NotificationsPage = () => {
 
       <SubSection title="Email" description="What lands in your inbox.">
         <SubCard>
+          <div className="flex items-start justify-between gap-6">
+            <div className="min-w-0">
+              <div className="text-[14px] font-medium text-foreground">Email notifications</div>
+              <div className="text-[12.5px] text-muted-foreground mt-0.5">
+                Turn off to stop all emails from Megsy, including product news
+              </div>
+            </div>
+            <Switch checked={prefs.email_enabled} onChange={(v) => setKey("email_enabled", v)} />
+          </div>
+        </SubCard>
+      </SubSection>
+
+      {prefs.email_enabled && (
+      <SubSection title="Email types" description="Fine-tune what we send.">
+        <SubCard>
           <div className="divide-y divide-border/60">
             {EMAIL_TOGGLES.map((t) => (
               <div key={t.key} className="flex items-start justify-between gap-6 py-3 first:pt-0 last:pb-0">
@@ -209,6 +237,7 @@ const NotificationsPage = () => {
           </div>
         </SubCard>
       </SubSection>
+      )}
     </SubShell>
   );
 };
