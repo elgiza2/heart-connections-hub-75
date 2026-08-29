@@ -1,10 +1,11 @@
 /** @doc Composer preferences — send-key behaviour. */
 import { useState, useCallback, useEffect } from "react";
 import { ArrowLeft } from "lucide-react";
-import { useSmartBack } from "@/hooks/useSmartBack";
+import { useNavigate } from "react-router-dom";
 import { getSendMode, setSendMode, type SendMode } from "@/lib/composerKey";
 
 const CustomizationPage = () => {
+  const navigate = useNavigate();
   const goBack = () => navigate("/settings");
   const [mode, setMode] = useState<SendMode>(() => getSendMode());
 

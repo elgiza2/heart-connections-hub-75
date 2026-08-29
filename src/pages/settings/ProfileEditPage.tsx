@@ -1,7 +1,6 @@
 /** @doc Profile editor — full name, nickname, AI instructions. Autosaves. */
 import { useEffect, useRef, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { useSmartBack } from "@/hooks/useSmartBack";
 import { Check, Camera, Loader2, LogOut, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
