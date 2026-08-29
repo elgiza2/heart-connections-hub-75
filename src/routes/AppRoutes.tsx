@@ -65,6 +65,7 @@ import {
   RestorePurchasePage,
   NotFoundPage,
   OnboardingPage,
+  SplashTestPage,
 } from "./lazyPages";
 
 const toChat = <RetiredRedirect to="/chat" />;
@@ -216,6 +217,7 @@ export const AppRoutes = ({ currentUserId }: { currentUserId: string | null }) =
     <Route path="/landing" element={toChat} />
     <Route path="/showcase" element={toChat} />
     <Route path="/welcome" element={<OnboardingPage />} />
+    <Route path="/test" element={<SplashTestPage />} />
     <Route path="/code" element={toChat} />
     <Route path="/build" element={toChat} />
     <Route path="/anything" element={toChat} />

@@ -75,6 +75,7 @@ export const LegalPage = lazy(() => import("@/pages/legal/LegalPage"));
 export const RestorePurchasePage = lazy(() => import("@/pages/legal/RestorePurchasePage"));
 export const NotFoundPage = lazy(() => import("@/pages/NotFoundPage"));
 export const OnboardingPage = lazy(() => import("@/pages/onboarding/WelcomeShowcasePage"));
+export const SplashTestPage = lazy(() => import("@/pages/test/SplashTestPage"));
 
 /* ── Standalone utilities ─────────────────────────────────────── */
 export const SlidesPreviewPage = lazy(() => import("@/pages/SlidesPreviewPage"));
