@@ -82,6 +82,11 @@ export default function SplashTestPage() {
           60%  { opacity: 1; }
           100% { transform: scaleX(1); opacity: .75; }
         }
+        .ms-word {
+          color: #ffffff !important;
+          -webkit-text-fill-color: #ffffff !important;
+          text-shadow: 0 6px 26px rgba(58,2,80,.35);
+        }
         @media (prefers-reduced-motion: reduce) {
           .ms-splash *, .ms-splash { animation-duration: .01ms !important; animation-delay: 0ms !important; }
         }
