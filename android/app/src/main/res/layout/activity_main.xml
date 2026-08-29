@@ -60,4 +60,6 @@
             android:text="@string/retry"
             app:backgroundTint="@color/brand_primary" />
     </LinearLayout>
+
+    <include layout="@layout/view_splash" />
 </androidx.constraintlayout.widget.ConstraintLayout>
