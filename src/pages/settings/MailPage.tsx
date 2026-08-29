@@ -689,43 +689,41 @@ function MessageView({
 
   return (
     <Sheet onClose={onClose}>
-      <div className="px-3 pt-3">
-        <IosHeader
-          left={
-            <RoundBtn label={tx("Back")} onClick={onClose}>
-              <ArrowLeft className="h-[18px] w-[18px] rtl:rotate-180" />
-            </RoundBtn>
-          }
-          title={
-            <HeaderTitle>
-              <span className="grid h-6 w-6 shrink-0 place-items-center rounded-full bg-foreground/[0.08] text-[10px] font-bold text-foreground/70">
-                {initials(who)}
-              </span>
-              <span className="truncate">{who}</span>
-            </HeaderTitle>
-          }
-          right={
-            <RoundBtn
-              label={tx(folder === "trash" ? "Delete forever" : "Move to trash")}
-              onClick={() => onAct(msg, folder === "trash" ? "delete" : "trash")}
-            >
-              <Trash2 className="h-[18px] w-[18px]" />
-            </RoundBtn>
-          }
-        />
+      {/* Flat reader bar — back, sender, delete */}
+      <div className="flex items-center gap-2 border-b border-foreground/[0.07] bg-card/80 px-3 py-2.5 backdrop-blur-xl">
+        <button
+          type="button"
+          aria-label={tx("Back")}
+          onClick={onClose}
+          style={{ borderRadius: 9999 }}
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-foreground/70 transition-colors hover:bg-foreground/[0.06] hover:text-foreground active:scale-90"
+        >
+          <span className="contents">
+            <ArrowLeft className="h-[19px] w-[19px] rtl:rotate-180" />
+          </span>
+        </button>
+        <span className="min-w-0 flex-1 truncate text-[14px] font-semibold tracking-tight">{who}</span>
+        <button
+          type="button"
+          aria-label={tx(folder === "trash" ? "Delete forever" : "Move to trash")}
+          onClick={() => onAct(msg, folder === "trash" ? "delete" : "trash")}
+          style={{ borderRadius: 9999 }}
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-90"
+        >
+          <span className="contents">
+            <Trash2 className="h-[18px] w-[18px]" />
+          </span>
+        </button>
       </div>
 
-      {/* One scrollable stack: subject header card → sender row → body */}
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 pb-4 pt-3">
-        <div className={glassCardCls}>
-          <div className="px-5 pb-4 pt-5">
-            <h2 className="text-[21px] font-semibold leading-snug tracking-tight">
-              {msg.subject || tx("(no subject)")}
-            </h2>
-          </div>
-          <div className={hairline} />
-          <div className="flex items-center gap-3 px-5 py-3.5">
-            <span className="grid h-9 w-9 shrink-0 place-items-center rounded-full bg-primary/10 text-[11px] font-bold text-primary">
+      {/* Reading surface: subject → sender → body, one calm column */}
+      <div className="min-h-0 flex-1 overflow-y-auto bg-card">
+        <div className="px-5 pt-6">
+          <h2 className="text-[24px] font-semibold leading-[1.25] tracking-tight">
+            {msg.subject || tx("(no subject)")}
+          </h2>
+          <div className="mt-4 flex items-center gap-3">
+            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-[12px] font-bold text-primary">
               {initials(who)}
             </span>
             <span className="min-w-0 flex-1">
@@ -735,21 +733,23 @@ function MessageView({
               </span>
             </span>
             <span className="shrink-0 text-[11.5px] tabular-nums text-foreground/40">
-              {new Date(msg.created_at).toLocaleString()}
+              {fmtDate(msg.created_at)}
             </span>
-          </div>
-          <div className={hairline} />
-          <div className="px-5 py-5">
-            {msg.body_html ? (
-              <HtmlBody html={msg.body_html} />
-            ) : (
-              <p className="whitespace-pre-wrap text-[15px] leading-[1.8] text-foreground/85">{msg.body_text}</p>
-            )}
           </div>
         </div>
 
+        <div className="mt-5 h-px bg-foreground/[0.07]" />
+
+        <div className="px-5 py-6">
+          {msg.body_html ? (
+            <HtmlBody html={msg.body_html} />
+          ) : (
+            <p className="whitespace-pre-wrap text-[15.5px] leading-[1.85] text-foreground/85">{msg.body_text}</p>
+          )}
+        </div>
+
         {explanation && (
-          <div className={`${glassCardCls} mt-3 bg-primary/[0.06] p-5`}>
+          <div className="mx-5 mb-6 rounded-2xl border border-primary/15 bg-primary/[0.06] p-4" style={{ borderRadius: 18 }}>
             <p className="mb-1.5 flex items-center gap-1.5 text-[12px] font-bold text-primary">
               <span className="contents">
                 <Sparkles className="h-3.5 w-3.5" />
@@ -760,6 +760,7 @@ function MessageView({
           </div>
         )}
       </div>
+
 
       {/* iOS 26 liquid-glass action bar: Reply pill + circular actions */}
       <div className="px-3 pb-4 pt-1">
