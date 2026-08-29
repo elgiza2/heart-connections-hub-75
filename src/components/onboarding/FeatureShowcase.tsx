@@ -1001,22 +1001,16 @@ const CTA_LABELS = [
 export default function FeatureShowcase({ onFinish }: { onFinish?: () => void }) {
   const [index, setIndex] = useState(0);
   const [dir, setDir] = useState<"next" | "prev">("next");
-  // First panel = region choice (language + billing gateway). Selecting a card
-  // persists the choice immediately so later panels and /auth follow it.
-  const [region, setRegion] = useState<PayRegion>(() => getPayRegionOrGuess());
-  const pickRegion = (r: PayRegion) => {
-    setRegion(r);
-    setPayRegion(r);
-    void setUserLang(r === "arab" ? "ar-eg" : "en", { syncRemote: false });
-  };
-  const pages = [
-    <Page key="region">
-      <Title heading="Choose your experience" kicker="اختر تجربتك" />
-      <RegionStage value={region} onChange={pickRegion} />
-    </Page>,
-    ...PAGES,
-  ];
-  const ctaLabels = [region === "arab" ? "ابدأ الآن" : "Continue", ...CTA_LABELS];
+  // Region (language + billing gateway) is detected automatically from the
+  // visitor's browser language / country / timezone — no manual slide.
+  const [region] = useState<PayRegion>(() => getPayRegionOrGuess());
+  useEffect(() => {
+    setPayRegion(region);
+    void setUserLang(region === "arab" ? "ar-eg" : "en", { syncRemote: false });
+  }, [region]);
+  const pages = PAGES;
+  const ctaLabels = CTA_LABELS;
+
   const last = index >= pages.length - 1;
 
   useEffect(() => {
