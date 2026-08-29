@@ -48,9 +48,9 @@ export default function SplashTestPage() {
         }
         /* the word takes its space only after the logo has shrunk */
         @keyframes ms-word-space {
-          0%, 30%  { width: 0; opacity: 0; }
-          52%      { width: var(--w); opacity: 1; }
-          100%     { width: var(--w); opacity: 1; }
+          0%, 30%  { max-width: 0; opacity: 0; }
+          52%      { max-width: 60vmin; opacity: 1; }
+          100%     { max-width: 60vmin; opacity: 1; }
         }
         @keyframes ms-word-wipe {
           0%, 30%  { clip-path: inset(0 100% 0 0); }
@@ -116,7 +116,7 @@ export default function SplashTestPage() {
           <div
             className="overflow-hidden"
             style={{
-              ["--w" as string]: "auto",
+              maxWidth: 0,
               animation: `ms-word-space ${DURATION}ms var(--e) forwards`,
             }}
           >
