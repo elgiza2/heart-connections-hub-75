@@ -11,7 +11,7 @@ import type { PayRegion } from "@/lib/payRegion";
 
 type Option = {
   id: PayRegion;
-  flag: string;
+  badge: string;
   title: string;
   subtitle: string;
   dir: "rtl" | "ltr";
@@ -21,7 +21,7 @@ type Option = {
 const OPTIONS: Option[] = [
   {
     id: "arab",
-    flag: "🇪🇬",
+    badge: "ع",
     title: "النسخة العربية",
     subtitle: "واجهة عربية بالكامل وطرق دفع محلية",
     dir: "rtl",
@@ -33,7 +33,7 @@ const OPTIONS: Option[] = [
   },
   {
     id: "global",
-    flag: "🌍",
+    badge: "EN",
     title: "Global edition",
     subtitle: "English interface with worldwide payment methods",
     dir: "ltr",
@@ -56,7 +56,6 @@ export default function RegionStage({
     <div style={{ display: "grid", gap: 12 }}>
       {OPTIONS.map((opt, i) => {
         const on = value === opt.id;
-        const start = opt.dir === "rtl" ? "row-reverse" : "row";
         return (
           <button
             key={opt.id}
@@ -91,7 +90,6 @@ export default function RegionStage({
             <div
               style={{
                 display: "flex",
-                flexDirection: start,
                 alignItems: "center",
                 gap: 12,
               }}
@@ -105,12 +103,14 @@ export default function RegionStage({
                   height: 40,
                   flex: "0 0 auto",
                   borderRadius: 14,
-                  fontSize: 20,
+                  fontSize: opt.badge.length > 1 ? 13 : 18,
+                  fontWeight: 700,
+                  letterSpacing: opt.badge.length > 1 ? "0.02em" : 0,
                   background: "rgba(255,255,255,0.10)",
                   border: "1px solid rgba(255,255,255,0.14)",
                 }}
               >
-                {opt.flag}
+                {opt.badge}
               </span>
 
               <div style={{ flex: 1, minWidth: 0 }}>
@@ -160,7 +160,6 @@ export default function RegionStage({
                 display: "flex",
                 flexWrap: "wrap",
                 gap: 7,
-                flexDirection: opt.dir === "rtl" ? "row-reverse" : "row",
                 justifyContent: "flex-start",
               }}
             >
