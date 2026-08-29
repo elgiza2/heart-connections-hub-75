@@ -72,6 +72,20 @@ class MainActivity : AppCompatActivity() {
         val target = intent?.data?.takeIf { UrlPolicy.isInternal(it) }?.toString()
         binding.webView.loadUrl(target ?: UrlPolicy.START_URL)
 
+        SplashAnimation.play(
+            root = binding.splash.splashRoot,
+            flood = binding.splash.splashFlood,
+            lockup = binding.splash.splashLockup,
+            mark = binding.splash.splashMark,
+            word = binding.splash.splashWord,
+        ) {
+            binding.splash.splashRoot.animate()
+                .alpha(0f)
+                .setDuration(220)
+                .withEndAction { binding.splash.splashRoot.visibility = View.GONE }
+                .start()
+        }
+
         onBackPressedDispatcher.addCallback(this, object : OnBackPressedCallback(true) {
             override fun handleOnBackPressed() {
                 if (binding.webView.canGoBack()) {
