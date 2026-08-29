@@ -65,7 +65,7 @@ export default function RegionStage({
       {/* segmented glass switch */}
       <div
         className="fs-up fs-glass"
-        role="tablist"
+        role="group"
         aria-label="Edition"
         style={{
           animationDelay: "0.18s",
@@ -99,8 +99,7 @@ export default function RegionStage({
             <button
               key={e.id}
               type="button"
-              role="tab"
-              aria-selected={on}
+              aria-pressed={on}
               onClick={() => onChange(e.id)}
               style={{
                 position: "relative",
