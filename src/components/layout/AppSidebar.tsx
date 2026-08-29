@@ -1,7 +1,7 @@
 import EmptyState from "@/components/common/EmptyState";
 import { memo, startTransition, useEffect, useMemo, useState, useCallback } from "react";
 import { useNavigate, useLocation, type NavigateOptions } from "react-router-dom";
-import { Plus, PanelLeft, LogIn, Cloud, Sparkles, Settings, ChevronDown } from "lucide-react";
+import { Plus, PanelLeft, LogIn, Cloud, Sparkles, Settings, ChevronDown, Mail as MailIcon } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { getUserSafe } from "@/lib/authSafe";
 import { getOwnProfile } from "@/lib/ownProfile";
@@ -19,6 +19,7 @@ import SidebarSubNav from "@/components/layout/SidebarSubNav";
 import { pathForZone, stripZonePrefix } from "@/lib/zoneRouting";
 import { prefetchRoute as sharedPrefetchRoute } from "@/hooks/usePrefetchRoute";
 import { t as uiT, useUserLang } from "@/lib/authI18n";
+import { useSidebarPins } from "@/lib/sidebarPins";
 import megsyCardImg from "@/assets/megsy-models-card.webp.asset.json";
 
 interface Conversation {
@@ -382,6 +383,7 @@ const AppSidebar = ({
     [closeInline, location.pathname, navigate, onClose],
   );
 
+  const sidebarPins = useSidebarPins();
   const currentAppPath = stripZonePrefix(location.pathname);
   const resolvedMobileSide =
     mobileSide ??
@@ -409,6 +411,16 @@ const AppSidebar = ({
     match: (p: string) => boolean;
   }> = [
   ];
+
+  // Mail only appears once the user pins it from the Mail page.
+  if (sidebarPins.includes("mail")) {
+    moreNav.push({
+      label: "Mail",
+      Icon: (props) => <MailIcon size={props.size} className={props.className} strokeWidth={props.strokeWidth} />,
+      path: "/settings/mail",
+      match: (p: string) => p.startsWith("/settings/mail"),
+    });
+  }
 
   // Earn is visible for everyone (site + Telegram). Tasks stays Telegram-only.
   moreNav.push({
