@@ -18,6 +18,7 @@ import { EGYPTIAN_DICT } from "@/lib/i18n/egyptianDict";
 import { EGYPTIAN_EXTRA } from "@/lib/i18n/egyptianExtra";
 import { EGYPTIAN_PAGES } from "@/lib/i18n/egyptianPages";
 import { EGYPTIAN_PAGES_2 } from "@/lib/i18n/egyptianPages2";
+import { setPayRegion } from "@/lib/payRegion";
 
 
 export type AuthLang = "en" | "ar-eg";
@@ -263,6 +264,17 @@ function applyHtmlLang(lang: AuthLang) {
 
 
 
+/** The language choice also drives the commercial zone (Arab vs International). */
+function applyZoneForLang(lang: AuthLang) {
+  setPayRegion(lang === "ar-eg" ? "arab" : "global");
+  try {
+    document.documentElement.dataset.zone = lang === "ar-eg" ? "arab" : "global";
+    window.dispatchEvent(new CustomEvent("megsy:zone", { detail: lang === "ar-eg" ? "arab" : "global" }));
+  } catch {
+    // ignore
+  }
+}
+
 function persistLangLocally(lang: AuthLang) {
   try {
     localStorage.setItem(STORAGE_KEY, lang);
@@ -293,6 +305,7 @@ export async function setUserLang(
   if (!isSupportedLang(lang)) return;
   persistLangLocally(lang);
   applyHtmlLang(lang);
+  applyZoneForLang(lang);
   emitChange(lang);
   try {
     window.dispatchEvent(new Event("languagechange-custom"));
@@ -330,6 +343,7 @@ export async function initUserLang(): Promise<AuthLang> {
     persistLangLocally(lang);
   }
   applyHtmlLang(lang);
+  applyZoneForLang(lang);
   emitChange(lang);
   return lang;
 }
