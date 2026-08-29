@@ -7,7 +7,7 @@
  */
 import { toast } from "sonner";
 import { stripComputerMention } from "@/lib/computer/shouldUseComputer";
-import type { Message } from "../chatConstants";
+import type { Message, ToolPart } from "../chatConstants";
 import { PENDING_COMPUTER_RUN } from "@/lib/computer/activeRun";
 
 export interface RunComputerArgs {
@@ -42,11 +42,18 @@ export async function runComputerTurn({
 }: RunComputerArgs) {
   const prompt = stripComputerMention(text);
   const assistantClientId = `assistant-${localTurnId}`;
+  const computerTool: ToolPart = {
+    id: `computer-${localTurnId}`,
+    name: "megsy_computer",
+    appSlug: "computer",
+    target: prompt || text,
+    state: "running",
+  };
 
   setMessages((prev) => [
     ...prev,
     userMsg,
-    { role: "assistant", content: "", clientId: assistantClientId },
+    { role: "assistant", content: "", clientId: assistantClientId, toolParts: [computerTool] },
   ]);
   setInput("");
   setAttachedFiles([]);
@@ -124,6 +131,7 @@ export async function runComputerTurn({
                 content: intro,
                 longRunId: run.id,
                 computerPlan: plan,
+                 toolParts: [{ ...computerTool, state: "done" }],
               }
             : m,
         ),
@@ -135,7 +143,11 @@ export async function runComputerTurn({
       setMessages((prev) =>
         prev.map((m) =>
           m.clientId === assistantClientId
-            ? { ...m, content: intro ? `${intro}\n\n${msg}` : msg }
+             ? {
+                 ...m,
+                 content: intro ? `${intro}\n\n${msg}` : msg,
+                 toolParts: [{ ...computerTool, state: "error", result: msg }],
+               }
             : m,
         ),
       );
@@ -147,7 +159,11 @@ export async function runComputerTurn({
     clearActiveComputerRun(PENDING_COMPUTER_RUN);
     const msg = e instanceof Error ? e.message : "المهمة على الكمبيوتر فشلت";
     setMessages((prev) =>
-      prev.map((m) => (m.clientId === assistantClientId ? { ...m, content: msg } : m)),
+      prev.map((m) =>
+        m.clientId === assistantClientId
+          ? { ...m, content: msg, toolParts: [{ ...computerTool, state: "error", result: msg }] }
+          : m,
+      ),
     );
     toast.error(msg);
   }
