@@ -1,6 +1,6 @@
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
-import type { Message } from "../chatConstants";
+import type { Message, ToolPart } from "../chatConstants";
 
 export interface RunOperatorArgs {
   text: string;
@@ -40,14 +40,22 @@ export async function runOperatorTurn({
   ownInsertedIdsRef,
 }: RunOperatorArgs) {
   const assistantClientId = `assistant-${localTurnId}`;
+  const operatorTool: ToolPart = {
+    id: `operator-${localTurnId}`,
+    name: "megsy_operator",
+    appSlug: "computer",
+    target: text,
+    state: "running",
+  };
   setMessages((prev) => [
     ...prev,
     userMsg,
     {
       role: "assistant",
-      content: "Thinking...",
+      content: "",
       clientId: assistantClientId,
       mode: "operator",
+      toolParts: [operatorTool],
     },
   ]);
   setInput("");
@@ -84,7 +92,13 @@ export async function runOperatorTurn({
       setMessages((prev) =>
         prev.map((m) =>
           m.clientId === assistantClientId
-            ? { ...m, id: assistantMessageId || m.id, content: "", operatorRunId: runId }
+             ? {
+                 ...m,
+                 id: assistantMessageId || m.id,
+                 content: "",
+                 operatorRunId: runId,
+                 toolParts: [{ ...operatorTool, state: "done" }],
+               }
             : m,
         ),
       );
@@ -92,7 +106,11 @@ export async function runOperatorTurn({
       setMessages((prev) =>
         prev.map((m) =>
           m.clientId === assistantClientId
-            ? { ...m, content: "Could not start Megsy Operator. Make sure you are signed in." }
+             ? {
+                 ...m,
+                 content: "Could not start Megsy Operator. Make sure you are signed in.",
+                 toolParts: [{ ...operatorTool, state: "error", result: "Could not start Operator" }],
+               }
             : m,
         ),
       );
@@ -102,7 +120,11 @@ export async function runOperatorTurn({
     setMessages((prev) =>
       prev.map((m) =>
         m.clientId === assistantClientId
-          ? { ...m, content: "An error occurred while running Megsy Operator." }
+          ? {
+              ...m,
+              content: "An error occurred while running Megsy Operator.",
+              toolParts: [{ ...operatorTool, state: "error", result: "Operator failed" }],
+            }
           : m,
       ),
     );

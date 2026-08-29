@@ -11,6 +11,7 @@ import {
   Calendar,
   Code2,
   Database,
+  Github,
   FileText,
   Globe,
   Image as ImageIcon,
@@ -24,6 +25,7 @@ import {
   Terminal,
   Video,
   Wrench,
+  Rocket,
 } from "lucide-react";
 
 export interface ToolMeta {
@@ -45,6 +47,9 @@ const RULES: Rule[] = [
   { test: /(web_?search|serp|google|bing|search)/i, icon: Search, ar: "بحث في الويب", en: "Web search", tint: "text-sky-400" },
   { test: /(browse|fetch_url|open_url|scrape|crawl|visit)/i, icon: Globe, ar: "تصفّح صفحة", en: "Browse page", tint: "text-sky-400" },
   { test: /(browser|screenshot|chrome|playwright)/i, icon: MonitorPlay, ar: "متصفح", en: "Browser", tint: "text-indigo-400" },
+  { test: /(computer|operator|manus|desktop)/i, icon: MonitorPlay, ar: "كمبيوتر Megsy", en: "Megsy Computer", tint: "text-blue-400" },
+  { test: /(github|git_|repository|pull_request)/i, icon: Github, ar: "GitHub", en: "GitHub", tint: "text-foreground" },
+  { test: /(deploy|publish|vercel|hosting|site_build)/i, icon: Rocket, ar: "النشر", en: "Deploy", tint: "text-blue-400" },
   { test: /(terminal|shell|bash|exec|command)/i, icon: Terminal, ar: "تيرمنال", en: "Terminal", tint: "text-emerald-400" },
   { test: /(code|python|node|run_script|interpreter)/i, icon: Code2, ar: "تشغيل كود", en: "Run code", tint: "text-emerald-400" },
   { test: /(file|upload|download|read_file|write_file|document|pdf|docx)/i, icon: FileText, ar: "ملفات", en: "Files", tint: "text-amber-400" },
@@ -66,10 +71,11 @@ export function isArabicUI(): boolean {
     (document.documentElement.lang || "").toLowerCase().startsWith("ar");
 }
 
-export function getToolMeta(name: string): ToolMeta {
+export function getToolMeta(name: string, appSlug?: string): ToolMeta {
   const ar = isArabicUI();
+  const identity = `${appSlug || ""} ${name}`.trim();
   for (const r of RULES) {
-    if (r.test.test(name)) return { icon: r.icon, label: ar ? r.ar : r.en, tint: r.tint };
+    if (r.test.test(identity)) return { icon: r.icon, label: ar ? r.ar : r.en, tint: r.tint };
   }
   return { icon: Wrench, label: prettifyToolName(name), tint: "text-muted-foreground" };
 }
