@@ -8040,6 +8040,7 @@ export type Database = {
           app_referral: boolean
           app_system: boolean
           created_at: string
+          email_enabled: boolean
           email_low_balance: boolean
           email_newsletter: boolean
           email_transactions: boolean
@@ -8055,6 +8056,7 @@ export type Database = {
           app_referral?: boolean
           app_system?: boolean
           created_at?: string
+          email_enabled?: boolean
           email_low_balance?: boolean
           email_newsletter?: boolean
           email_transactions?: boolean
@@ -8070,6 +8072,7 @@ export type Database = {
           app_referral?: boolean
           app_system?: boolean
           created_at?: string
+          email_enabled?: boolean
           email_low_balance?: boolean
           email_newsletter?: boolean
           email_transactions?: boolean
