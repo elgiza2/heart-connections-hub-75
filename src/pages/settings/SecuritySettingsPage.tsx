@@ -52,8 +52,7 @@ const SecuritySettingsPage = () => {
     navigate("/auth");
   };
 
-  const goBack = () =>
-    window.history.length > 1 ? window.history.back() : navigate("/settings");
+  const goBack = () => navigate("/settings");
 
   if (isMobile) {
     return (

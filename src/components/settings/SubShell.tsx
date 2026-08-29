@@ -5,7 +5,7 @@ import { cn } from "@/lib/utils";
 import { useIsMobile } from "@/hooks/use-mobile";
 import { DesktopSettingsLayout } from "@/components/settings/DesktopSettingsLayout";
 import ProfileGlassShell from "@/components/profile/ProfileGlassShell";
-import { useSmartBack } from "@/hooks/useSmartBack";
+import { useNavigate } from "react-router-dom";
 
 // ============================================================================
 // SubShell — top-level wrapper for every settings sub-page.
@@ -24,8 +24,10 @@ interface SubShellProps {
 
 export function SubShell({ title, subtitle, backTo = "/settings", onBack, action, children }: SubShellProps) {
   const isMobile = useIsMobile();
-  const smartBack = useSmartBack(backTo);
-  const goBack = onBack ?? smartBack;
+  const navigate = useNavigate();
+  // Settings pages always step up to their parent screen — browser history can
+  // point anywhere (deep links, redirects) and used to land users on the wrong page.
+  const goBack = onBack ?? (() => navigate(backTo));
 
 
   if (!isMobile) {
