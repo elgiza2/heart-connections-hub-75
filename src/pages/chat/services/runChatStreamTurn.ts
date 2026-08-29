@@ -1048,13 +1048,52 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
       }
       // Detect <MEGSY_MAIL .../> — the assistant's own mailbox tool.
       if (/<MEGSY_MAIL/i.test(assistantContent)) {
+        const mailTaskId = `megsy-mail-${localTurnId}`;
+        const mailPart: ToolPart = {
+          id: mailTaskId,
+          name: "megsy_mail",
+          appSlug: "email",
+          state: "running",
+        };
+        upsertAssistantToolPart(mailPart);
+        setToolActivity({ name: "megsy_mail", appSlug: "email", status: "running" });
+        updateAssistantMessage((message) => ({
+          ...message,
+          toolParts: [...(message.toolParts || []).filter((part) => part.id !== mailTaskId), mailPart],
+        }));
         try {
           const { handleMailTag } = await import("@/lib/chat/handleMailTag");
           const res = await handleMailTag(assistantContent);
           assistantContent = res.notes.length
             ? `${res.text}\n\n${res.notes.join("\n")}`.trim()
             : res.text;
-        } catch { /* noop */ }
+          const completed: ToolPart = { ...mailPart, state: "done", result: res.notes };
+          upsertAssistantToolPart(completed);
+          setToolActivity({ name: "megsy_mail", appSlug: "email", status: "done" });
+          updateAssistantMessage((message) => ({
+            ...message,
+            content: assistantContent,
+            toolParts: (message.toolParts || []).map((part) =>
+              part.id === mailTaskId ? completed : part,
+            ),
+          }));
+        } catch (error) {
+          assistantContent = sanitizeLeakedToolText(assistantContent);
+          const failed: ToolPart = {
+            ...mailPart,
+            state: "error",
+            result: error instanceof Error ? error.message : "Mail action failed",
+          };
+          upsertAssistantToolPart(failed);
+          setToolActivity({ name: "megsy_mail", appSlug: "email", status: "error" });
+          updateAssistantMessage((message) => ({
+            ...message,
+            content: assistantContent,
+            toolParts: (message.toolParts || []).map((part) =>
+              part.id === mailTaskId ? failed : part,
+            ),
+          }));
+        }
       }
       if (assistantRenderTimer) {
         clearTimeout(assistantRenderTimer);
