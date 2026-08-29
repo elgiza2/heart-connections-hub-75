@@ -1,6 +1,6 @@
 import { memo, useEffect, useMemo, useState } from "react";
 
-import MegsyStar from "@/components/files/MegsyStar";
+import MegsyStar from "@/components/branding/MegsyStar";
 import { t as uiT, useUserLang } from "@/lib/authI18n";
 
 interface ThinkingLoaderProps {
@@ -95,7 +95,7 @@ const ThinkingLoader = ({ searchStatus }: ThinkingLoaderProps) => {
   if (searchStatus?.trim()) {
     return (
       <div className="flex items-center gap-2 py-1" aria-live="polite" dir={rtl ? "rtl" : undefined}>
-        <MegsyStar size={22} className={starClass} />
+        <MegsyStar className={`h-[22px] w-[22px] ${starClass}`} />
         <span className="ai-shimmer text-[13px] font-medium motion-reduce:animate-none">
           {searchStatus}
         </span>
@@ -106,7 +106,7 @@ const ThinkingLoader = ({ searchStatus }: ThinkingLoaderProps) => {
   if (elapsed < 5000) {
     return (
       <div className="flex items-center gap-2 py-1" aria-live="polite" dir={rtl ? "rtl" : undefined}>
-        <MegsyStar size={16} className={starClass} />
+        <MegsyStar className={`h-4 w-4 ${starClass}`} />
         <span className="ai-shimmer text-[13px] font-medium motion-reduce:animate-none">
           {thinkingLabel}
         </span>
@@ -117,7 +117,7 @@ const ThinkingLoader = ({ searchStatus }: ThinkingLoaderProps) => {
   if (elapsed < 15000) {
     return (
       <div className="flex items-center gap-2 py-1" aria-live="polite" dir={rtl ? "rtl" : undefined}>
-        <MegsyStar size={16} className={starClass} />
+        <MegsyStar className={`h-4 w-4 ${starClass}`} />
         <span className="ai-shimmer text-[13px] font-medium motion-reduce:animate-none">
           {deepLabel}
         </span>
@@ -128,7 +128,7 @@ const ThinkingLoader = ({ searchStatus }: ThinkingLoaderProps) => {
   const stepLabel = steps[stepIdx] ?? steps[0];
   return (
     <div className="flex items-center gap-2 py-1" aria-live="polite" dir={rtl ? "rtl" : undefined}>
-      <MegsyStar size={16} className={starClass} />
+      <MegsyStar className={`h-4 w-4 ${starClass}`} />
       <span
         key={stepIdx}
         className="ai-shimmer text-[13px] font-medium motion-reduce:animate-none transition-opacity duration-500"

@@ -1,6 +1,6 @@
 import { memo, useMemo, useState } from "react";
 import { ChevronDown } from "lucide-react";
-import MegsyStar from "@/components/files/MegsyStar";
+import MegsyStar from "@/components/branding/MegsyStar";
 import { BrandLogo } from "@/components/brand/BrandLogo";
 import { t as uiT, useUserLang } from "@/lib/authI18n";
 
@@ -64,10 +64,7 @@ const ThinkingTrace = ({
     <div className={`mb-3 ${className}`} dir={rtl ? "rtl" : undefined}>
       <div className="flex w-full items-center gap-2 py-0.5">
         {active ? (
-          <MegsyStar
-            size={14}
-            className="text-[var(--megsy-blue)]"
-          />
+          <MegsyStar className="h-3.5 w-3.5 text-[var(--megsy-blue)]" />
         ) : (
           <BrandLogo className="h-3.5 w-3.5" />
         )}

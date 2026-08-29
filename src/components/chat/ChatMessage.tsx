@@ -19,7 +19,7 @@ import {
 } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { m as motion, AnimatePresence } from "framer-motion";
-import MegsyStar from "@/components/files/MegsyStar";
+import MegsyStarBrand from "@/components/branding/MegsyStar";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import remarkBreaks from "remark-breaks";
@@ -1778,7 +1778,7 @@ const ChatMessage = ({
                     {inner}
                     {isStreaming && (
                       <span className="inline-flex ms-1 align-baseline">
-                        <MegsyStar size={14} className="text-[var(--megsy-blue)]" />
+                        <MegsyStarBrand className="h-3.5 w-3.5 text-[var(--megsy-blue)]" />
                       </span>
                     )}
                   </div>
