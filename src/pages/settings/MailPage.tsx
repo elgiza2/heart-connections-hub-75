@@ -320,50 +320,57 @@ export default function MailPage() {
 
   const folderLabel = FOLDERS.find((f) => f.key === folder)?.label ?? "Inbox";
 
-  /* ── Header: refresh / folder title / search — one unified glass pill ── */
+  /* ── Header: calm inbox hero — folder title, address line, quiet actions ── */
   const Header = (
-    <IosHeader
-      left={
-        <RoundBtn label={tx("Refresh")} onClick={() => void refresh(folder)}>
-          <RefreshCw className={`h-[18px] w-[18px] ${loading || syncing ? "animate-spin" : ""}`} />
-        </RoundBtn>
-      }
-      title={
-        <HeaderTitle>
-          <span className="truncate">{tx(folderLabel)}</span>
-        </HeaderTitle>
-      }
-      right={
-        <RoundBtn label={tx("Search email")} onClick={() => setSearching((s) => !s)}>
-          {searching ? <X className="h-[18px] w-[18px]" /> : <SearchIcon className="h-[18px] w-[18px]" />}
-        </RoundBtn>
-      }
-    />
+    <motion.header
+      initial={{ opacity: 0, y: -6 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.35, ease: "easeOut" }}
+      className="px-1"
+    >
+      <div className="flex items-end gap-3">
+        <div className="min-w-0 flex-1">
+          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-foreground/35">
+            {tx("Megsy Mail")}
+          </p>
+          <h2 className="mt-0.5 truncate text-[28px] font-semibold leading-tight tracking-tight">
+            {tx(folderLabel)}
+          </h2>
+        </div>
+        <div className="flex shrink-0 items-center gap-1">
+          <RoundBtn label={tx("Refresh")} onClick={() => void refresh(folder)}>
+            <RefreshCw className={`h-[18px] w-[18px] ${loading || syncing ? "animate-spin" : ""}`} />
+          </RoundBtn>
+          <RoundBtn label={tx("Search email")} onClick={() => setSearching((s) => !s)}>
+            {searching ? <X className="h-[18px] w-[18px]" /> : <SearchIcon className="h-[18px] w-[18px]" />}
+          </RoundBtn>
+        </div>
+      </div>
+    </motion.header>
   );
 
-  /* ── Address chip (tap to copy) + optional search field ── */
+  /* ── Address line (tap to copy) + optional search field ── */
   const Meta = (
-    <div className="mt-2.5 space-y-2.5">
-      <div className="flex justify-center">
-        <button
-          type="button"
-          onClick={copyAddress}
-          aria-label={tx("Copy address")}
-          style={{ borderRadius: 9999 }}
-          className="inline-flex min-w-0 max-w-full items-center gap-1.5 rounded-full border border-white/40 bg-card/60 px-3 py-1.5 text-[12.5px] font-medium text-foreground/70 backdrop-blur-xl transition-opacity active:opacity-60 dark:border-white/10"
-        >
-          <span className="truncate" dir="ltr">
-            {box?.address ?? "…"}
-          </span>
-          <span className="contents">
-            {copied ? (
-              <Check className="h-3.5 w-3.5 shrink-0 text-primary" />
-            ) : (
-              <Copy className="h-3.5 w-3.5 shrink-0 text-foreground/35" />
-            )}
-          </span>
-        </button>
-      </div>
+    <div className="mt-3 space-y-2.5 px-1">
+      <button
+        type="button"
+        onClick={copyAddress}
+        aria-label={tx("Copy address")}
+        className="group flex w-full min-w-0 items-center gap-2 rounded-2xl border border-foreground/[0.07] bg-foreground/[0.03] px-3.5 py-2.5 text-start transition-colors hover:bg-foreground/[0.05]"
+        style={{ borderRadius: 16 }}
+      >
+        <span className="min-w-0 flex-1 truncate text-[13px] font-medium text-foreground/70" dir="ltr">
+          {box?.address ?? "…"}
+        </span>
+        <span className="contents">
+          {copied ? (
+            <Check className="h-4 w-4 shrink-0 text-primary" />
+          ) : (
+            <Copy className="h-4 w-4 shrink-0 text-foreground/35" />
+          )}
+        </span>
+      </button>
+
 
       {searching && (
         <div className={`${glassCardCls} flex h-12 items-center gap-2.5 px-4`} style={{ borderRadius: 9999 }}>
