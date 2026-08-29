@@ -331,11 +331,6 @@ export default function MailPage() {
       title={
         <HeaderTitle>
           <span className="truncate">{tx(folderLabel)}</span>
-          {unread > 0 && folder === "inbox" && (
-            <span className="shrink-0 rounded-full bg-primary/12 px-1.5 py-0.5 text-[11px] font-bold tabular-nums text-primary">
-              {unread}
-            </span>
-          )}
         </HeaderTitle>
       }
       right={
@@ -518,12 +513,7 @@ export default function MailPage() {
                         className="absolute inset-0 rounded-full bg-primary shadow-[0_6px_18px_-4px_hsl(var(--primary)/0.55),inset_0_1px_0_hsl(0_0%_100%/0.35)]"
                       />
                     )}
-                    <span className="relative z-10">
-                      {tx(f.label)}
-                      {f.key === "inbox" && unread > 0 && (
-                        <span className="ms-1.5 tabular-nums opacity-75">{unread}</span>
-                      )}
-                    </span>
+                    <span className="relative z-10">{tx(f.label)}</span>
                   </button>
                 );
               })}
