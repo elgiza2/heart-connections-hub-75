@@ -11,7 +11,6 @@ import android.view.View
 import android.webkit.PermissionRequest
 import android.webkit.ValueCallback
 import android.webkit.WebChromeClient
-import android.webkit.WebView
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.result.contract.ActivityResultContracts
@@ -261,6 +260,3 @@ class MainActivity : AppCompatActivity() {
         super.onDestroy()
     }
 }
-
-private fun WebView.setDownloadListener(listener: android.webkit.DownloadListener) =
-    this.setDownloadListener(listener)
