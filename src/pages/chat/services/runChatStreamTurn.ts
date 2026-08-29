@@ -1163,7 +1163,6 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
       }
       settleRunningTools("done");
       setIsLoading(false);
-      settleRunningTools("error");
       setIsThinking(false);
       resetToolUi();
       isSubmittingRef.current = false;
@@ -1333,6 +1332,7 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
       } else {
         toast.error(err);
       }
+      settleRunningTools("error");
       setIsThinking(false);
       setIsLoading(false);
       resetToolUi();
