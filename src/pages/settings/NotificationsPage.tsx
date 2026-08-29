@@ -14,6 +14,7 @@ type Prefs = {
   app_credits: boolean;
   app_referral: boolean;
   app_system: boolean;
+  email_enabled: boolean;
   email_transactions: boolean;
   email_low_balance: boolean;
   email_welcome: boolean;
@@ -25,6 +26,7 @@ const DEFAULTS: Prefs = {
   app_credits: true,
   app_referral: true,
   app_system: true,
+  email_enabled: true,
   email_transactions: true,
   email_low_balance: true,
   email_welcome: true,
