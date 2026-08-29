@@ -75,6 +75,7 @@ export default function RegionStage({
           borderRadius: 999,
           padding: 5,
           overflow: "hidden",
+          background: "rgba(255,255,255,0.06)",
         }}
       >
         <span
