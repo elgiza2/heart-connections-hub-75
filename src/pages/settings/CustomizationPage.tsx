@@ -5,7 +5,7 @@ import { useSmartBack } from "@/hooks/useSmartBack";
 import { getSendMode, setSendMode, type SendMode } from "@/lib/composerKey";
 
 const CustomizationPage = () => {
-  const goBack = useSmartBack("/settings");
+  const goBack = () => navigate("/settings");
   const [mode, setMode] = useState<SendMode>(() => getSendMode());
 
   useEffect(() => {

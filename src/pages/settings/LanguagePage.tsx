@@ -86,7 +86,7 @@ export default function LanguagePage() {
       <ProfileGlassShell
         title={tx("Language")}
         subtitle={tx("Pick how Megsy talks to you.")}
-        onBack={() => (window.history.length > 1 ? window.history.back() : navigate("/settings"))}
+        onBack={() => navigate("/settings")}
       >
         {Content}
       </ProfileGlassShell>

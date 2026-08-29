@@ -125,7 +125,7 @@ const ProfileEditPage = () => {
     return () => clearTimeout(timer);
   }, [fullName, nickname, instructions, loading, userId]);
 
-  const goBack = useSmartBack("/settings");
+  const goBack = () => navigate("/settings");
 
   const pickAvatar = () => fileRef.current?.click();
 
