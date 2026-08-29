@@ -139,10 +139,25 @@ Deno.serve(async (req) => {
     const to = String(payload.to || "").trim().toLowerCase();
     const subject = String(payload.subject || "").slice(0, 300);
     const text = String(payload.text || "").slice(0, 50_000);
-    const html = payload.html ? String(payload.html).slice(0, 200_000) : null;
+    const rawHtml = payload.html ? String(payload.html).slice(0, 200_000) : null;
     const origin = payload.origin === "ai" ? "ai" : "user";
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(to)) return json({ error: "invalid recipient" }, 400);
     if (!subject && !text) return json({ error: "empty message" }, 400);
+
+    // Every outgoing email wears the Megsy brand shell (unless a caller sends
+    // a full HTML document of its own).
+    const code = payload.code ? String(payload.code).slice(0, 12) : null;
+    const isFullDoc = !!rawHtml && /<html[\s>]/i.test(rawHtml);
+    const html = isFullDoc
+      ? rawHtml
+      : renderBrandEmail({
+          title: subject || "Megsy",
+          bodyHtml: rawHtml,
+          bodyText: text,
+          code,
+          ctaLabel: payload.cta_label ? String(payload.cta_label) : null,
+          ctaUrl: payload.cta_url ? String(payload.cta_url) : null,
+        });
 
     const internal = isInternal(to);
     let status: string = internal ? "delivered" : "queued";
