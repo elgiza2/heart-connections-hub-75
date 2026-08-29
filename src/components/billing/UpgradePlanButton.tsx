@@ -118,9 +118,9 @@ export function UpgradePlanButton({ variant = "full", className, hideCredits = f
     >
 
 
-      {/* Star icon — Megsy brand sparkle, emerald */}
+      {/* Star icon — Megsy brand sparkle, blue */}
       <MegsyStar
-        className={`relative z-10 transition-transform duration-200 group-hover:scale-105 text-[#50C878] ${variant === "compact" ? "w-4 h-4" : "w-3.5 h-3.5"}`}
+        className={`relative z-10 transition-transform duration-200 group-hover:scale-105 text-[var(--megsy-blue)] ${variant === "compact" ? "w-4 h-4" : "w-3.5 h-3.5"}`}
       />
 
       {/* Label (hidden in the icon-only compact variant) */}

@@ -14,6 +14,7 @@ import {
   Loader2,
   
   Paperclip,
+  PanelLeft,
   PenLine,
   Plus,
   RefreshCw,
@@ -27,6 +28,7 @@ import {
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { isPinned, setPinned } from "@/lib/sidebarPins";
 import DesktopSettingsLayout from "@/components/settings/DesktopSettingsLayout";
 import ProfileGlassShell from "@/components/profile/ProfileGlassShell";
 import { Input } from "@/components/ui/input";
@@ -214,6 +216,7 @@ export default function MailPage() {
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [pinned, setPinnedState] = useState(() => isPinned("mail"));
 
   useEffect(() => {
     let alive = true;
@@ -320,7 +323,7 @@ export default function MailPage() {
 
   const folderLabel = FOLDERS.find((f) => f.key === folder)?.label ?? "Inbox";
 
-  /* ── Header: calm inbox hero — folder title, address line, quiet actions ── */
+  /* ── Header: folder title + quiet actions ── */
   const Header = (
     <motion.header
       initial={{ opacity: 0, y: -6 }}
@@ -328,16 +331,22 @@ export default function MailPage() {
       transition={{ duration: 0.35, ease: "easeOut" }}
       className="px-1"
     >
-      <div className="flex items-end gap-3">
-        <div className="min-w-0 flex-1">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-foreground/35">
-            {tx("Megsy Mail")}
-          </p>
-          <h2 className="mt-0.5 truncate text-[28px] font-semibold leading-tight tracking-tight">
-            {tx(folderLabel)}
-          </h2>
-        </div>
+      <div className="flex items-center gap-3">
+        <h2 className="min-w-0 flex-1 truncate text-[28px] font-semibold leading-tight tracking-tight">
+          {tx(folderLabel)}
+        </h2>
         <div className="flex shrink-0 items-center gap-1">
+          <RoundBtn
+            label={tx(pinned ? "Remove from sidebar" : "Add to sidebar")}
+            tone={pinned ? "accent" : "plain"}
+            onClick={() => {
+              setPinned("mail", !pinned);
+              setPinnedState(!pinned);
+              toast.success(tx(pinned ? "Removed from sidebar" : "Added to sidebar"));
+            }}
+          >
+            {pinned ? <Check className="h-[18px] w-[18px]" /> : <PanelLeft className="h-[18px] w-[18px]" />}
+          </RoundBtn>
           <RoundBtn label={tx("Refresh")} onClick={() => void refresh(folder)}>
             <RefreshCw className={`h-[18px] w-[18px] ${loading || syncing ? "animate-spin" : ""}`} />
           </RoundBtn>
@@ -348,6 +357,7 @@ export default function MailPage() {
       </div>
     </motion.header>
   );
+
 
   /* ── Address line (tap to copy) + optional search field ── */
   const Meta = (
@@ -571,7 +581,6 @@ export default function MailPage() {
     return (
       <ProfileGlassShell
         title={tx("Mail")}
-        subtitle={tx("Your own Megsy inbox")}
         onBack={() => navigate("/settings")}
       >
         {Body}
@@ -593,16 +602,31 @@ export default function MailPage() {
   );
 }
 
-function Sheet({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+function Sheet({
+  children,
+  onClose,
+  full = false,
+}: {
+  children: React.ReactNode;
+  onClose: () => void;
+  /** Reader mode: fills the screen on mobile, a tall centered panel on desktop. */
+  full?: boolean;
+}) {
   // Rendered in a portal: settings pages apply global CSS that collapses
   // icon-bearing controls, and the overlay must escape that scope.
   return createPortal(
     <div
-      className="fixed inset-0 z-50 grid place-items-end bg-black/35 backdrop-blur-[3px] sm:place-items-center sm:p-6"
+      className={`fixed inset-0 z-50 grid bg-black/40 backdrop-blur-[3px] sm:place-items-center sm:p-6 ${
+        full ? "place-items-stretch" : "place-items-end"
+      }`}
       onClick={onClose}
     >
       <div
-        className="flex max-h-[95vh] w-full flex-col overflow-hidden rounded-t-[30px] bg-muted shadow-2xl sm:max-w-2xl sm:rounded-[30px]"
+        className={
+          full
+            ? "flex h-full w-full flex-col overflow-hidden bg-background sm:h-[92vh] sm:max-w-3xl sm:rounded-[28px] sm:shadow-2xl"
+            : "flex max-h-[95vh] w-full flex-col overflow-hidden rounded-t-[30px] bg-muted shadow-2xl sm:max-w-2xl sm:rounded-[30px]"
+        }
         onClick={(e) => e.stopPropagation()}
       >
         {children}
@@ -611,6 +635,7 @@ function Sheet({ children, onClose }: { children: React.ReactNode; onClose: () =
     document.body,
   );
 }
+
 
 /** HTML bodies render inside a sandboxed iframe so remote markup can never touch the app. */
 function HtmlBody({ html }: { html: string }) {
@@ -688,27 +713,30 @@ function MessageView({
   const who = displayName(msg.from_name, msg.from_address);
 
   return (
-    <Sheet onClose={onClose}>
-      {/* Flat reader bar — back, sender, delete */}
-      <div className="flex items-center gap-2 border-b border-foreground/[0.07] bg-card/80 px-3 py-2.5 backdrop-blur-xl">
+    <Sheet full onClose={onClose}>
+      {/* Top bar — back to the folder, single destructive action */}
+      <div
+        className="flex items-center gap-1 border-b border-foreground/[0.06] px-2 py-2"
+        style={{ paddingTop: "max(8px, env(safe-area-inset-top, 0px))" }}
+      >
         <button
           type="button"
-          aria-label={tx("Back")}
           onClick={onClose}
           style={{ borderRadius: 9999 }}
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-foreground/70 transition-colors hover:bg-foreground/[0.06] hover:text-foreground active:scale-90"
+          className="inline-flex h-9 items-center gap-1 rounded-full px-2 text-[14px] font-medium text-primary transition-colors hover:bg-primary/[0.08] active:scale-95"
         >
           <span className="contents">
-            <ArrowLeft className="h-[19px] w-[19px] rtl:rotate-180" />
+            <ArrowLeft className="h-[18px] w-[18px] rtl:rotate-180" />
           </span>
+          {tx(FOLDERS.find((f) => f.key === folder)?.label ?? "Inbox")}
         </button>
-        <span className="min-w-0 flex-1 truncate text-[14px] font-semibold tracking-tight">{who}</span>
+        <span className="flex-1" />
         <button
           type="button"
           aria-label={tx(folder === "trash" ? "Delete forever" : "Move to trash")}
           onClick={() => onAct(msg, folder === "trash" ? "delete" : "trash")}
           style={{ borderRadius: 9999 }}
-          className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-foreground/60 transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-90"
+          className="grid h-9 w-9 shrink-0 place-items-center rounded-full text-foreground/55 transition-colors hover:bg-destructive/10 hover:text-destructive active:scale-90"
         >
           <span className="contents">
             <Trash2 className="h-[18px] w-[18px]" />
@@ -716,83 +744,85 @@ function MessageView({
         </button>
       </div>
 
-      {/* Reading surface: subject → sender → body, one calm column */}
-      <div className="min-h-0 flex-1 overflow-y-auto bg-card">
-        <div className="px-5 pt-6">
-          <h2 className="text-[24px] font-semibold leading-[1.25] tracking-tight">
+      {/* Reading column */}
+      <div className="min-h-0 flex-1 overflow-y-auto">
+        <article className="mx-auto w-full max-w-[680px] px-5 pb-10 pt-7 sm:px-8">
+          <h2 className="text-[26px] font-semibold leading-[1.22] tracking-[-0.02em] sm:text-[30px]">
             {msg.subject || tx("(no subject)")}
           </h2>
-          <div className="mt-4 flex items-center gap-3">
-            <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-primary/10 text-[12px] font-bold text-primary">
+
+          <div className="mt-5 flex items-center gap-3">
+            <span className="grid h-11 w-11 shrink-0 place-items-center rounded-full bg-primary/10 text-[13px] font-bold text-primary">
               {initials(who)}
             </span>
             <span className="min-w-0 flex-1">
-              <span className="block truncate text-[14px] font-semibold">{who}</span>
-              <span className="block truncate text-[12px] text-foreground/45" dir="ltr">
+              <span className="block truncate text-[15px] font-semibold leading-tight">{who}</span>
+              <span className="mt-0.5 block truncate text-[12.5px] text-foreground/45" dir="ltr">
                 {msg.from_address}
               </span>
             </span>
-            <span className="shrink-0 text-[11.5px] tabular-nums text-foreground/40">
+            <span className="shrink-0 text-[12px] tabular-nums text-foreground/40">
               {fmtDate(msg.created_at)}
             </span>
           </div>
-        </div>
 
-        <div className="mt-5 h-px bg-foreground/[0.07]" />
+          <div className="my-6 h-px bg-foreground/[0.06]" />
 
-        <div className="px-5 py-6">
           {msg.body_html ? (
             <HtmlBody html={msg.body_html} />
           ) : (
-            <p className="whitespace-pre-wrap text-[15.5px] leading-[1.85] text-foreground/85">{msg.body_text}</p>
+            <p className="whitespace-pre-wrap text-[16px] leading-[1.85] text-foreground/85">{msg.body_text}</p>
           )}
+
+          {explanation && (
+            <div className="mt-7 rounded-3xl bg-primary/[0.07] p-5" style={{ borderRadius: 22 }}>
+              <p className="mb-2 flex items-center gap-1.5 text-[12px] font-bold uppercase tracking-[0.1em] text-primary">
+                <span className="contents">
+                  <Sparkles className="h-3.5 w-3.5" />
+                </span>
+                {tx("Megsy's summary")}
+              </p>
+              <p className="whitespace-pre-wrap text-[14px] leading-[1.75] text-foreground/85">{explanation}</p>
+            </div>
+          )}
+        </article>
+      </div>
+
+      {/* Footer actions */}
+      <div
+        className="border-t border-foreground/[0.06] px-4 py-3"
+        style={{ paddingBottom: "max(12px, env(safe-area-inset-bottom, 0px))" }}
+      >
+        <div className="mx-auto flex w-full max-w-[680px] items-center gap-2">
+          <button
+            type="button"
+            onClick={() => onReply(msg)}
+            style={{ borderRadius: 9999 }}
+            className="inline-flex h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-primary text-[15px] font-semibold text-primary-foreground transition-transform active:scale-[0.97]"
+          >
+            <span className="contents">
+              <CornerUpLeft className="h-[17px] w-[17px] rtl:rotate-180" />
+            </span>
+            {tx("Reply")}
+          </button>
+          <RoundBtn label={tx("Explain with AI")} disabled={explaining} onClick={() => void explain()}>
+            {explaining ? <Loader2 className="h-[17px] w-[17px] animate-spin" /> : <Sparkles className="h-[17px] w-[17px] text-primary" />}
+          </RoundBtn>
+          <RoundBtn label={tx("Forward")} onClick={() => onForward(msg)}>
+            <Forward className="h-[17px] w-[17px] rtl:rotate-180" />
+          </RoundBtn>
+          <RoundBtn
+            label={tx(folder === "spam" ? "Not spam" : "Mark as spam")}
+            onClick={() => onAct(msg, folder === "spam" ? "inbox" : "spam")}
+          >
+            <Inbox className="h-[17px] w-[17px]" />
+          </RoundBtn>
         </div>
-
-        {explanation && (
-          <div className="mx-5 mb-6 rounded-2xl border border-primary/15 bg-primary/[0.06] p-4" style={{ borderRadius: 18 }}>
-            <p className="mb-1.5 flex items-center gap-1.5 text-[12px] font-bold text-primary">
-              <span className="contents">
-                <Sparkles className="h-3.5 w-3.5" />
-              </span>
-              {tx("Megsy's summary")}
-            </p>
-            <p className="whitespace-pre-wrap text-[13.5px] leading-relaxed">{explanation}</p>
-          </div>
-        )}
       </div>
-
-
-      {/* Action bar — flat, attached to the reading surface */}
-      <div className="flex items-center gap-2 border-t border-foreground/[0.07] bg-card px-3 py-3">
-        <button
-          type="button"
-          onClick={() => onReply(msg)}
-          style={{ borderRadius: 9999 }}
-          className="inline-flex h-11 min-w-0 flex-1 items-center justify-center gap-2 rounded-full bg-primary text-[15px] font-semibold text-primary-foreground transition-transform active:scale-[0.97]"
-        >
-          <span className="contents">
-            <CornerUpLeft className="h-[17px] w-[17px] rtl:rotate-180" />
-          </span>
-          {tx("Reply")}
-        </button>
-        <RoundBtn label={tx("Explain with AI")} disabled={explaining} onClick={() => void explain()}>
-          {explaining ? <Loader2 className="h-[17px] w-[17px] animate-spin" /> : <Sparkles className="h-[17px] w-[17px] text-primary" />}
-        </RoundBtn>
-        <RoundBtn label={tx("Forward")} onClick={() => onForward(msg)}>
-          <Forward className="h-[17px] w-[17px] rtl:rotate-180" />
-        </RoundBtn>
-        <RoundBtn
-          label={tx(folder === "spam" ? "Not spam" : "Mark as spam")}
-          onClick={() => onAct(msg, folder === "spam" ? "inbox" : "spam")}
-        >
-          <Inbox className="h-[17px] w-[17px]" />
-        </RoundBtn>
-      </div>
-
-
     </Sheet>
   );
 }
+
 
 function Composer({
   tx,
