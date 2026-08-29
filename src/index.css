@@ -944,15 +944,18 @@ html:not(.dark) [class*="text-white/"]:not(.theme-fixed) {
   color: hsl(var(--muted-foreground)) !important;
 }
 
-/* + button in composer: fully borderless, plain icon (no fill, no accent). */
+/* + button in composer: borderless, blue icon in both themes. */
 .animated-plus-btn,
 button[data-testid="mobile-composer-plus"] {
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
+  color: var(--megsy-blue) !important;
 }
+.animated-plus-btn svg,
+button[data-testid="mobile-composer-plus"] svg { color: var(--megsy-blue) !important; }
 .animated-plus-btn:hover,
-button[data-testid="mobile-composer-plus"]:hover { background: transparent !important; }
+button[data-testid="mobile-composer-plus"]:hover { background: transparent !important; opacity: 0.85; }
 html.dark .animated-plus-btn,
 html[data-theme="dark"] .animated-plus-btn,
 html.dark button[data-testid="mobile-composer-plus"],
@@ -960,6 +963,7 @@ html[data-theme="dark"] button[data-testid="mobile-composer-plus"] {
   background: transparent !important;
   border: 0 !important;
   box-shadow: none !important;
+  color: var(--megsy-blue) !important;
 }
 html:not(.dark) .bg-black:not(.theme-fixed) {
   background-color: hsl(var(--card)) !important;
