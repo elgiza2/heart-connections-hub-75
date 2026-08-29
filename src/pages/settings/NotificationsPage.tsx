@@ -209,6 +209,21 @@ const NotificationsPage = () => {
 
       <SubSection title="Email" description="What lands in your inbox.">
         <SubCard>
+          <div className="flex items-start justify-between gap-6">
+            <div className="min-w-0">
+              <div className="text-[14px] font-medium text-foreground">Email notifications</div>
+              <div className="text-[12.5px] text-muted-foreground mt-0.5">
+                Turn off to stop all emails from Megsy, including product news
+              </div>
+            </div>
+            <Switch checked={prefs.email_enabled} onChange={(v) => setKey("email_enabled", v)} />
+          </div>
+        </SubCard>
+      </SubSection>
+
+      {prefs.email_enabled && (
+      <SubSection title="Email types" description="Fine-tune what we send.">
+        <SubCard>
           <div className="divide-y divide-border/60">
             {EMAIL_TOGGLES.map((t) => (
               <div key={t.key} className="flex items-start justify-between gap-6 py-3 first:pt-0 last:pb-0">
