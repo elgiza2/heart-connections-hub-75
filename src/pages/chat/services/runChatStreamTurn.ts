@@ -240,6 +240,28 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
     assistantToolParts = [...assistantToolParts, part];
   };
 
+  const updateAssistantMessage = (update: (message: Message) => Message) => {
+    setMessages((prev) => {
+      const index = prev.findIndex((message) => message.clientId === `assistant-${localTurnId}`);
+      if (index < 0 || prev[index]?.role !== "assistant") return prev;
+      const next = prev.slice();
+      next[index] = update(prev[index]);
+      return next;
+    });
+  };
+
+  const settleRunningTools = (state: "done" | "error") => {
+    assistantToolParts = assistantToolParts.map((part) =>
+      part.state === "running" ? { ...part, state } : part,
+    );
+    updateAssistantMessage((message) => ({
+      ...message,
+      toolParts: message.toolParts?.map((part) =>
+        part.state === "running" ? { ...part, state } : part,
+      ),
+    }));
+  };
+
   let capturedUsage: { prompt_tokens?: number; completion_tokens?: number; total_tokens?: number } | null = null;
   let capturedModel: string | null = null;
 
@@ -570,15 +592,10 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
     onReasoning: (delta: string) => {
       if (!delta) return;
       assistantReasoning += delta;
-      setMessages((prev) => {
-        const idx = assistantMessageIndex;
-        if (idx < 0 || idx >= prev.length) return prev;
-        const msg = prev[idx];
-        if (msg.role !== "assistant") return prev;
-        const next = prev.slice();
-        next[idx] = { ...msg, reasoning: (msg.reasoning || "") + delta };
-        return next;
-      });
+      updateAssistantMessage((message) => ({
+        ...message,
+        reasoning: (message.reasoning || "") + delta,
+      }));
     },
     onUsage: (u) => {
       if (!u) return;
@@ -624,13 +641,7 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
       if (ev === "resume_id") {
         const rid = String(payload?.resumeId || "");
         if (!rid) return;
-        setMessages((prev) => {
-          const idx = assistantMessageIndex;
-          if (idx < 0 || idx >= prev.length) return prev;
-          const next = prev.slice();
-          next[idx] = { ...next[idx], resumeId: rid };
-          return next;
-        });
+        updateAssistantMessage((message) => ({ ...message, resumeId: rid }));
         return;
       }
       if (ev === "narration") {
@@ -674,8 +685,8 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
           // stream end and re-renders. assistant-ui Tool primitives can
           // later read the same data via the external-store adapter.
           setMessages((prev) => {
-            const idx = assistantMessageIndex;
-            if (idx < 0 || idx >= prev.length) return prev;
+            const idx = prev.findIndex((message) => message.clientId === `assistant-${localTurnId}`);
+            if (idx < 0 || prev[idx]?.role !== "assistant") return prev;
             const msg = prev[idx];
             const nextParts = [...(msg.toolParts || [])];
             const existing = nextParts.findIndex((p) => p.id === taskId);
@@ -748,8 +759,8 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
           );
           // Persist tool result on the assistant message.
           setMessages((prev) => {
-            const idx = assistantMessageIndex;
-            if (idx < 0 || idx >= prev.length) return prev;
+            const idx = prev.findIndex((message) => message.clientId === `assistant-${localTurnId}`);
+            if (idx < 0 || prev[idx]?.role !== "assistant") return prev;
             const msg = prev[idx];
             if (!msg.toolParts?.length) return prev;
             const taskId = payload.call_id ? String(payload.call_id) : "";
@@ -1150,7 +1161,9 @@ export async function runChatStreamTurn(opts: RunChatStreamTurnOptions): Promise
           .trimEnd();
         assistantContent = `${assistantContent}\n\n${isArabicReport ? "## مصادر" : "## Sources"}\n\n${sourceLines.join("\n")}`;
       }
+      settleRunningTools("done");
       setIsLoading(false);
+      settleRunningTools("error");
       setIsThinking(false);
       resetToolUi();
       isSubmittingRef.current = false;
