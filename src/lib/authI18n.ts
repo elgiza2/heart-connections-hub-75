@@ -268,7 +268,7 @@ function applyHtmlLang(lang: AuthLang) {
 function applyZoneForLang(lang: AuthLang) {
   setPayRegion(lang === "ar-eg" ? "arab" : "global");
   try {
-    document.documentElement.dataset.zone = lang === "ar-eg" ? "arab" : "global";
+    document.documentElement.dataset.payZone = lang === "ar-eg" ? "arab" : "global";
     window.dispatchEvent(new CustomEvent("megsy:zone", { detail: lang === "ar-eg" ? "arab" : "global" }));
   } catch {
     // ignore
