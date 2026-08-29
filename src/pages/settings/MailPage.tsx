@@ -14,6 +14,7 @@ import {
   Loader2,
   
   Paperclip,
+  PanelLeft,
   PenLine,
   Plus,
   RefreshCw,
@@ -27,6 +28,7 @@ import {
 import { motion } from "framer-motion";
 import { toast } from "sonner";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { isPinned, setPinned } from "@/lib/sidebarPins";
 import DesktopSettingsLayout from "@/components/settings/DesktopSettingsLayout";
 import ProfileGlassShell from "@/components/profile/ProfileGlassShell";
 import { Input } from "@/components/ui/input";
@@ -214,6 +216,7 @@ export default function MailPage() {
   const [query, setQuery] = useState("");
   const [searching, setSearching] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [pinned, setPinnedState] = useState(() => isPinned("mail"));
 
   useEffect(() => {
     let alive = true;
@@ -578,7 +581,6 @@ export default function MailPage() {
     return (
       <ProfileGlassShell
         title={tx("Mail")}
-        subtitle={tx("Your own Megsy inbox")}
         onBack={() => navigate("/settings")}
       >
         {Body}
