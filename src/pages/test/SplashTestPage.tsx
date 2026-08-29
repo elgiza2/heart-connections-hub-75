@@ -183,7 +183,7 @@ export default function SplashTestPage() {
         <div className="absolute flex flex-col items-center">
           <div className="relative overflow-hidden px-2">
             <span
-              className="block select-none font-semibold leading-none text-white"
+              className="ms-word block select-none font-semibold leading-none"
               style={{
                 fontFamily: '"Space Grotesk", "DM Sans", system-ui, sans-serif',
                 fontSize: "13vmin",
