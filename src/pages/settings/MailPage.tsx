@@ -320,7 +320,7 @@ export default function MailPage() {
 
   const folderLabel = FOLDERS.find((f) => f.key === folder)?.label ?? "Inbox";
 
-  /* ── Header: calm inbox hero — folder title, address line, quiet actions ── */
+  /* ── Header: folder title + quiet actions ── */
   const Header = (
     <motion.header
       initial={{ opacity: 0, y: -6 }}
@@ -328,16 +328,22 @@ export default function MailPage() {
       transition={{ duration: 0.35, ease: "easeOut" }}
       className="px-1"
     >
-      <div className="flex items-end gap-3">
-        <div className="min-w-0 flex-1">
-          <p className="text-[12px] font-semibold uppercase tracking-[0.14em] text-foreground/35">
-            {tx("Megsy Mail")}
-          </p>
-          <h2 className="mt-0.5 truncate text-[28px] font-semibold leading-tight tracking-tight">
-            {tx(folderLabel)}
-          </h2>
-        </div>
+      <div className="flex items-center gap-3">
+        <h2 className="min-w-0 flex-1 truncate text-[28px] font-semibold leading-tight tracking-tight">
+          {tx(folderLabel)}
+        </h2>
         <div className="flex shrink-0 items-center gap-1">
+          <RoundBtn
+            label={tx(pinned ? "Remove from sidebar" : "Add to sidebar")}
+            tone={pinned ? "accent" : "plain"}
+            onClick={() => {
+              setPinned("mail", !pinned);
+              setPinnedState(!pinned);
+              toast.success(tx(pinned ? "Removed from sidebar" : "Added to sidebar"));
+            }}
+          >
+            {pinned ? <Check className="h-[18px] w-[18px]" /> : <PanelLeft className="h-[18px] w-[18px]" />}
+          </RoundBtn>
           <RoundBtn label={tx("Refresh")} onClick={() => void refresh(folder)}>
             <RefreshCw className={`h-[18px] w-[18px] ${loading || syncing ? "animate-spin" : ""}`} />
           </RoundBtn>
@@ -348,6 +354,7 @@ export default function MailPage() {
       </div>
     </motion.header>
   );
+
 
   /* ── Address line (tap to copy) + optional search field ── */
   const Meta = (
