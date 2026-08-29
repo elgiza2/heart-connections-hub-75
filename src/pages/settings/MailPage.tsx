@@ -20,7 +20,6 @@ import {
   RefreshCw,
   Search as SearchIcon,
   Send,
-  Sparkles,
   Trash2,
   Type as TypeIcon,
   X,
@@ -34,7 +33,6 @@ import ProfileGlassShell from "@/components/profile/ProfileGlassShell";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { translateExactText, useUserLang } from "@/lib/authI18n";
-import { explainMail } from "@/lib/mail/explainMail";
 import {
   deleteForever,
   ensureMailbox,
