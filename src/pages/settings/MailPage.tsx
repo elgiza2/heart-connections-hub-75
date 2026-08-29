@@ -602,16 +602,31 @@ export default function MailPage() {
   );
 }
 
-function Sheet({ children, onClose }: { children: React.ReactNode; onClose: () => void }) {
+function Sheet({
+  children,
+  onClose,
+  full = false,
+}: {
+  children: React.ReactNode;
+  onClose: () => void;
+  /** Reader mode: fills the screen on mobile, a tall centered panel on desktop. */
+  full?: boolean;
+}) {
   // Rendered in a portal: settings pages apply global CSS that collapses
   // icon-bearing controls, and the overlay must escape that scope.
   return createPortal(
     <div
-      className="fixed inset-0 z-50 grid place-items-end bg-black/35 backdrop-blur-[3px] sm:place-items-center sm:p-6"
+      className={`fixed inset-0 z-50 grid bg-black/40 backdrop-blur-[3px] sm:place-items-center sm:p-6 ${
+        full ? "place-items-stretch" : "place-items-end"
+      }`}
       onClick={onClose}
     >
       <div
-        className="flex max-h-[95vh] w-full flex-col overflow-hidden rounded-t-[30px] bg-muted shadow-2xl sm:max-w-2xl sm:rounded-[30px]"
+        className={
+          full
+            ? "flex h-full w-full flex-col overflow-hidden bg-background sm:h-[92vh] sm:max-w-3xl sm:rounded-[28px] sm:shadow-2xl"
+            : "flex max-h-[95vh] w-full flex-col overflow-hidden rounded-t-[30px] bg-muted shadow-2xl sm:max-w-2xl sm:rounded-[30px]"
+        }
         onClick={(e) => e.stopPropagation()}
       >
         {children}
@@ -620,6 +635,7 @@ function Sheet({ children, onClose }: { children: React.ReactNode; onClose: () =
     document.body,
   );
 }
+
 
 /** HTML bodies render inside a sandboxed iframe so remote markup can never touch the app. */
 function HtmlBody({ html }: { html: string }) {
