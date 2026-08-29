@@ -10,7 +10,6 @@ import { RatingBadge } from "@/components/foundations/rating-badge";
 import ServicesStage from "./ServicesStage";
 import AgentStoryStage from "./AgentStoryStage";
 import { getPlan, PLAN_MONTHLY_CREDITS } from "@/data/pricingData";
-import RegionStage from "./RegionStage";
 import {
   getPayRegionOrGuess,
   setPayRegion,
