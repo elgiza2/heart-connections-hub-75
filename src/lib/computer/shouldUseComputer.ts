@@ -38,6 +38,12 @@ const STRONG_AR = [
   /(اشترك|سجلني|انشئ لي حساب)/,
 ];
 
+/** Mail-sending asks handled by the Megsy Mail tool, not the computer agent. */
+const MAIL_INTENT =
+  /(ابعت|ارسل|إبعت|أرسل|بعتلي|ابعتلي|رد على|ردي على)\s*(لي|لى)?\s*(ال)?(ايميل|إيميل|بريد|ميل|رساله|رسالة|mail)/i;
+const MAIL_INTENT_EN =
+  /\b(send|reply to|forward|draft|write)\b[^.\n]{0,30}\b(e-?mail|mail|message)\b/i;
+
 /** Short "go ahead" replies that continue a previously proposed computer task. */
 const AFFIRMATIONS =
   /^(تمام|تمام يلا|يلا|يلا بينا|ماشي|اوك|أوك|اوكي|ok|okay|go|go ahead|كمل|كملي|ابدا|ابدأ|نفذ|هيا|اه|ايوه|نعم|yes|sure|do it|proceed|start)[\s!.،؟]*$/i;
@@ -69,10 +75,15 @@ export function shouldUseComputer(text: string): boolean {
   if (!t) return false;
   if (/(^|\s)@computer\b/i.test(t)) return true;
   if (t.length < 8) return false;
+  // Sending mail is Megsy Mail's own tool, never a computer-agent task —
+  // even though the message carries an email address.
+  if (MAIL_INTENT.test(normalizeArabic(t)) || MAIL_INTENT_EN.test(t)) return false;
   // A message carrying credentials (email + something else) is always a
   // "do it for me on a real browser" request.
   const hasEmail = /[\w.+-]+@[\w-]+\.[a-z]{2,}/i.test(t);
-  if (hasEmail && t.length > 12) return true;
+  const hasCredentialCue =
+    /(الباسورد|كلمه السر|كلمة السر|باسوورد|password|login|log in|sign in|تسجيل\s*دخول|سجل\s*دخول)/i.test(t);
+  if (hasEmail && hasCredentialCue && t.length > 12) return true;
   const ar = normalizeArabic(t);
   const hits =
     STRONG_EN.filter((r) => r.test(t)).length +
