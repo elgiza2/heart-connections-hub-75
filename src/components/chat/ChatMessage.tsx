@@ -1778,7 +1778,7 @@ const ChatMessage = ({
                     {inner}
                     {isStreaming && (
                       <span className="inline-flex ms-1 align-baseline">
-                        <MegsyStar size={14} className="text-[var(--megsy-blue)]" />
+                        <MegsyStarBrand className="h-3.5 w-3.5 text-[var(--megsy-blue)]" />
                       </span>
                     )}
                   </div>
